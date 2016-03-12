@@ -31,7 +31,8 @@
         android:text="Back"
         android:id="@+id/btnAllTaskBack"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:onClick="BackToGroupList"/>
 
     <Button
         android:layout_width="wrap_content"

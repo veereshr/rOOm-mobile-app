@@ -9,4 +9,54 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.dips.smartscheduler.InviteToGroup">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Invite To Group"
+        android:id="@+id/txtInviteGroup"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Person :"
+        android:id="@+id/txtViewPerson"
+        android:layout_below="@+id/txtInviteGroup"
+        android:layout_alignParentStart="true" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/dropDownPerson"
+        android:spinnerMode="dropdown"
+        android:layout_below="@+id/txtViewPerson"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Group :"
+        android:id="@+id/txtViewGroup"
+        android:layout_below="@+id/dropDownPerson"
+        android:layout_alignParentStart="true" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/dropDownGroup"
+        android:spinnerMode="dropdown"
+        android:layout_below="@+id/txtViewGroup"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Invite To Group"
+        android:id="@+id/btnInviteToGroup"
+        android:layout_below="@+id/dropDownGroup"
+        android:layout_alignParentStart="true"
+        android:onClick="InviteToGroup"/>
+
 </RelativeLayout>
