@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -26,11 +27,24 @@ public class ViewTask extends AppCompatActivity {
 
         ArrayAdapter tasksAdapter= new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, (List<String>) tasks) ;
         viewListTask.setAdapter(tasksAdapter);
+        viewListTask.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> a, View v, int position, long id) {
+                Intent intent = new Intent(getApplicationContext(), ViewSingleTask.class);
+                startActivity(intent);
+            }
+        });
     }
 
     public void BackToGroupList (View view){
         Intent intent = new Intent(getApplicationContext(), GroupList.class);
         startActivity(intent);
     }
+
+    public void CreateAccount(View v){
+        Intent intent = new Intent(v.getContext(),CreateTask.class);
+        startActivity(intent);
+    }
+
 }
 

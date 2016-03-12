@@ -13,14 +13,14 @@
         <activity android:name=".ViewTask">
         </activity>
         <activity android:name=".LogIn" >
-        </activity>
-        <activity android:name=".CreateAccount" >
-        </activity>
-        <activity android:name=".GroupList" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".CreateAccount" >
+        </activity>
+        <activity android:name=".GroupList" >
         </activity>
         <activity android:name=".InviteToGroup" >
         </activity>
