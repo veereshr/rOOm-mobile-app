@@ -8,8 +8,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".CreateTask" >
-        </activity>
+        <activity android:name=".CreateTask"/>
         <activity android:name=".ViewTask">
         </activity>
         <activity android:name=".LogIn" >
@@ -18,7 +17,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".CreateAccount" >
+        <activity android:name=".CreateAccount"
+                  android:label="Create Account">
         </activity>
         <activity android:name=".GroupList" >
         </activity>
