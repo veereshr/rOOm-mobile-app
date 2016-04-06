@@ -5,6 +5,7 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,22 +13,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.ExpandableListAdapter;
-import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,11 +29,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 public class CreateTask extends AppCompatActivity {
@@ -49,6 +38,7 @@ public class CreateTask extends AppCompatActivity {
     private DatePicker datePicker;
     private Calendar calendar;
     private int year, month, day;
+    private int yearNew, monthNew, dayNew;
     private Bitmap curimage;
     private ArrayList imageList = new ArrayList();
 
@@ -64,10 +54,13 @@ public class CreateTask extends AppCompatActivity {
         day = calendar.get(Calendar.DAY_OF_MONTH);
         showDate(year, month, day);
 
-        //TODO get current group team members and fill spinner
-        Spinner dropdown = (Spinner)findViewById(R.id.createTaskTeam);
-        List<String> listGroupItems=new ArrayList<>();
-        listGroupItems.add("");
+        //get current group team members and fill spinner
+        SharedPreferences prefs = getSharedPreferences("Data", MODE_PRIVATE);
+        int groupID = prefs.getInt("groupID", 0);
+        DatabaseHelper dbhelper = new DatabaseHelper(this);
+        List<String> listGroupItems = dbhelper.GetGroupMembersName(groupID);
+        Spinner dropdown = (Spinner) findViewById(R.id.createTaskTeam);
+        listGroupItems.add(0, "");
         ArrayAdapter<String> adapterGroupName = new ArrayAdapter<>(
                 this, android.R.layout.simple_spinner_dropdown_item, listGroupItems);
         dropdown.setAdapter(adapterGroupName);
@@ -75,9 +68,10 @@ public class CreateTask extends AppCompatActivity {
 
     //used for Select Date
     @SuppressWarnings("deprecation")
-    public void GetDate(View view){
+    public void GetDate(View view) {
         showDialog(999);
     }
+
     @SuppressWarnings("deprecation")
     protected Dialog onCreateDialog(int id) {
         if (id == 999) {
@@ -85,25 +79,30 @@ public class CreateTask extends AppCompatActivity {
         }
         return null;
     }
+
     private DatePickerDialog.OnDateSetListener myDateListener = new DatePickerDialog.OnDateSetListener() {
         @Override
         public void onDateSet(DatePicker arg0, int arg1, int arg2, int arg3) {
             // arg1 = year
             // arg2 = month
             // arg3 = day
-            showDate(arg1, arg2+1, arg3);
+            showDate(arg1, arg2 + 1, arg3);
         }
     };
+
     private void showDate(int year, int month, int day) {
+        yearNew = year;
+        monthNew = month;
+        dayNew = day;
         ((TextView) findViewById(R.id.createTaskDate)).setText(new StringBuilder().append(month).append("/")
                 .append(day).append("/").append(year));
     }
     //end of Select Date
 
     //start of image upload
-    public void UploadImage(View view){
+    public void UploadImage(View view) {
 
-        final CharSequence[] options = { "Take Photo", "Choose from Gallery","Cancel" };
+        final CharSequence[] options = {"Take Photo", "Choose from Gallery", "Cancel"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Add Photo!");
@@ -126,6 +125,7 @@ public class CreateTask extends AppCompatActivity {
         });
         builder.show();
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -170,8 +170,8 @@ public class CreateTask extends AppCompatActivity {
             } else if (requestCode == 2) {
 
                 Uri selectedImage = data.getData();
-                String[] filePath = { MediaStore.Images.Media.DATA };
-                Cursor c = getContentResolver().query(selectedImage,filePath, null, null, null);
+                String[] filePath = {MediaStore.Images.Media.DATA};
+                Cursor c = getContentResolver().query(selectedImage, filePath, null, null, null);
                 c.moveToFirst();
                 int columnIndex = c.getColumnIndex(filePath[0]);
                 String picturePath = c.getString(columnIndex);
@@ -180,11 +180,11 @@ public class CreateTask extends AppCompatActivity {
                 Log.w("CompleteTask", picturePath + "");
             }
             //if image is selected
-            if(curimage != null){
+            if (curimage != null) {
                 curimage = Bitmap.createScaledBitmap(curimage, 500, 500, true);
                 ImageView iv = new ImageView(this);
                 iv.setImageBitmap(curimage);
-                iv.setPadding(10,10, 10, 10);
+                iv.setPadding(10, 10, 10, 10);
                 imageList.add(curimage);
                 ((LinearLayout) findViewById(R.id.createTaskImageLayout)).addView(iv);
             }
@@ -194,7 +194,47 @@ public class CreateTask extends AppCompatActivity {
     //end of image upload
 
     public void CreateTask(View view) {
-        Intent i = new Intent(getApplicationContext(), ViewTask.class);
-        startActivity(i);
+
+        String title = "";
+        String desc = "";
+        String assignedTo = "";
+        String date = "";
+        String startdate = month + "/" + day + "/" + year;
+
+        title = ((TextView) findViewById(R.id.createTaskName)).getText().toString();
+        desc = ((TextView) findViewById(R.id.createTaskDesc)).getText().toString();
+        assignedTo = ((Spinner) findViewById(R.id.createTaskTeam)).getSelectedItem().toString();
+        date = ((TextView) findViewById(R.id.createTaskDate)).getText().toString();
+
+        if (title.equals("")) {
+            Toast.makeText(this, "Title can't be empty", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (desc.equals("")) {
+            Toast.makeText(this, "Description can't be empty", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (!(yearNew >= year && monthNew >= month && dayNew >= day)) {
+            Toast.makeText(this, "Invalid complete by date", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        //get current group
+        SharedPreferences prefs = getSharedPreferences("Data", MODE_PRIVATE);
+        int groupID = prefs.getInt("groupID", 0);
+
+
+        //CREATE EVENT IN DB
+        int res;
+        DatabaseHelper dbhelper = new DatabaseHelper(this);
+        res = dbhelper.InsertNewTask(groupID, title, desc, assignedTo, date, startdate, imageList);
+
+        if (res != -1) {
+            Toast.makeText(this, "Saved Task", Toast.LENGTH_SHORT).show();
+            Intent i = new Intent(getApplicationContext(), ViewTask.class);
+            startActivity(i);
+        } else {
+            Toast.makeText(this, "Error saving to database", Toast.LENGTH_SHORT).show();
+        }
     }
 }

@@ -18,7 +18,7 @@ public class CreateAccount extends AppCompatActivity {
         //TODO get users phonenumber
     }
 
-    public void CreateAccount(View v){
+    public void CreateAccount(View v) {
         //getdata
         String pNum = "";
         String pass = "";
@@ -26,35 +26,40 @@ public class CreateAccount extends AppCompatActivity {
         String fName = "";
         String lName = "";
         String email = "";
-        pNum = ((TextView)findViewById(R.id.phoneText)).getText().toString();
-        pass = ((TextView)findViewById(R.id.passText)).getText().toString();
-        passCon = ((TextView)findViewById(R.id.passConText)).getText().toString();
-        fName = ((TextView)findViewById(R.id.fNameText)).getText().toString();
-        lName = ((TextView)findViewById(R.id.lNameText)).getText().toString();
-        email = ((TextView)findViewById(R.id.emailText)).getText().toString();
+        pNum = ((TextView) findViewById(R.id.phoneText)).getText().toString();
+        pass = ((TextView) findViewById(R.id.passText)).getText().toString();
+        passCon = ((TextView) findViewById(R.id.passConText)).getText().toString();
+        fName = ((TextView) findViewById(R.id.fNameText)).getText().toString();
+        lName = ((TextView) findViewById(R.id.lNameText)).getText().toString();
+        email = ((TextView) findViewById(R.id.emailText)).getText().toString();
 
         //validate Data
         //Removes all non numbers from phonenumber
         pNum = pNum.replaceAll("[^\\d.]", "");
-        ((TextView)findViewById(R.id.phoneText)).setText(pNum);
+        ((TextView) findViewById(R.id.phoneText)).setText(pNum);
         //check phonenumber length
-        if(pNum.length() < 1){
-            Toast.makeText(this,"Phone number can not be empty",Toast.LENGTH_SHORT).show();
-        }else{
+        if (pNum.length() < 1) {
+            Toast.makeText(this, "Phone number can not be empty", Toast.LENGTH_SHORT).show();
+        } else {
             //check if password match
-            if(!pass.equals(passCon))
-            {
-                Toast.makeText(this,"Passwords do not match",Toast.LENGTH_SHORT).show();
-            }else{
+            if (!pass.equals(passCon)) {
+                Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show();
+            } else {
                 //TODO CHECK IF USER ALREADY EXIST
 
                 //save to db
                 DatabaseHelper dbhelper = new DatabaseHelper(this);
-                dbhelper.InsertNewUser(pNum,pass,fName,lName,email);
+                if(dbhelper.InsertNewUser(pNum, pass, fName, lName, email) != -1){
+                    Toast.makeText(v.getContext(), "Account Created", Toast.LENGTH_SHORT).show();
 
-                //passing intent
-                Intent intent = new Intent(v.getContext(),GroupList.class);
-                startActivity(intent);
+                    //passing intent
+                    Intent intent = new Intent(v.getContext(), LogIn.class);
+                    startActivity(intent);
+                }else{
+                    Toast.makeText(v.getContext(), "Error saving to database", Toast.LENGTH_SHORT).show();
+                }
+
+
             }
         }
     }

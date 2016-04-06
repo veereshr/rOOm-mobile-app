@@ -1,6 +1,7 @@
 package com.example.dips.smartscheduler;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -30,6 +31,12 @@ public class ViewTask extends AppCompatActivity {
         viewListTask.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> a, View v, int position, long id) {
+
+                //TODO FILL THIS IN WITH REAL task DATA
+                SharedPreferences.Editor editor = getSharedPreferences("Data", MODE_PRIVATE).edit();
+                editor.putInt("eventID", 0);
+                editor.commit();
+
                 Intent intent = new Intent(getApplicationContext(), ViewSingleTask.class);
                 startActivity(intent);
             }
