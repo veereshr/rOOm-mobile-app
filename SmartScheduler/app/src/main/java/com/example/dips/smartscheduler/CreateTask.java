@@ -56,7 +56,9 @@ public class CreateTask extends AppCompatActivity {
 
         //get current group team members and fill spinner
         SharedPreferences prefs = getSharedPreferences("Data", MODE_PRIVATE);
-        int groupID = prefs.getInt("groupID", 0);
+        int groupID = prefs.getInt("groupID", 1);
+
+
         DatabaseHelper dbhelper = new DatabaseHelper(this);
         List<String> listGroupItems = dbhelper.GetGroupMembersName(groupID);
         Spinner dropdown = (Spinner) findViewById(R.id.createTaskTeam);
@@ -221,7 +223,7 @@ public class CreateTask extends AppCompatActivity {
 
         //get current group
         SharedPreferences prefs = getSharedPreferences("Data", MODE_PRIVATE);
-        int groupID = prefs.getInt("groupID", 0);
+        int groupID = prefs.getInt("groupID", 1);
 
 
         //CREATE EVENT IN DB

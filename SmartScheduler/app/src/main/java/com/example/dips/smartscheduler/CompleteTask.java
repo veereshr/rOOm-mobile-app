@@ -3,6 +3,7 @@ package com.example.dips.smartscheduler;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -21,24 +22,45 @@ import java.io.OutputStream;
 import android.database.Cursor;
 import android.util.Log;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 
 public class CompleteTask extends AppCompatActivity {
 
     private Bitmap curimage;
     private ArrayList imageList = new ArrayList();
+    private List<Bitmap> completedImages; // just the ones that were added on this screen
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_complete_task);
-        //TODO GET CURRENT TASK
-        ((TextView) findViewById(R.id.completeTaskTitle)).setText("Title");
-        ((TextView) findViewById(R.id.completeTaskDesc)).setText("Description");
-        ((TextView) findViewById(R.id.completeTaskDue)).setText("03/04/2016");
-        ((TextView) findViewById(R.id.completeTaskFinish)).setText("03/06/2016");
+
+        SharedPreferences prefs = getSharedPreferences("Data", MODE_PRIVATE);
+        int taskID = prefs.getInt("eventID", 1);
+
+        DatabaseHelper dbhelper = new DatabaseHelper(this);
+        String[] listGroupItems = dbhelper.GetTaskInfo(taskID);
+        ((TextView) findViewById(R.id.completeTaskTitle)).setText(listGroupItems[0]);
+        ((TextView) findViewById(R.id.completeTaskDesc)).setText(listGroupItems[1]);
+        ((TextView) findViewById(R.id.completeTaskDue)).setText(listGroupItems[2]);
+        
+        //get todays date
+        Calendar calendar = Calendar.getInstance();
+        String finishDate = calendar.get(Calendar.MONTH)+"/"+calendar.get(Calendar.DAY_OF_MONTH)+"/"+calendar.get(Calendar.YEAR);
+
+        ((TextView) findViewById(R.id.completeTaskFinish)).setText(finishDate);
+
+        //GET PICTURES
+        List<Bitmap> images = dbhelper.GetImages(taskID);
+        for ( Bitmap image : images){
+            ImageView iv = new ImageView(this);
+            iv.setImageBitmap(image);
+            iv.setPadding(10, 10, 10, 10);
+            ((LinearLayout) findViewById(R.id.completeTaskImageLayout)).addView(iv);
+        }
     }
 
     public void UploadImage(View view){

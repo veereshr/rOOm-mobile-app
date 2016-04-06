@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.nfc.Tag;
 import android.util.Log;
 
@@ -122,6 +123,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return -1;
     }
 
+    //used in createAccount to check if user already exist
+    public boolean checkIfUserExist(String pNum) {
+        try {
+            SQLiteDatabase db = this.getWritableDatabase();
+            Cursor cursor = db.rawQuery("SELECT * FROM UserTable WHERE phoneNumber = " + pNum, null);
+            return cursor.moveToNext();
+        } catch (Exception e) {
+            Log.i(LOGTAG, "Failed to check if user exist " + e.toString());
+        }
+        return false;
+    }
+
+    //used in createTask to build out task and add pictures and put in group
     public int InsertNewTask(int groupID, String title, String desc, String assignedTo, String date, String startDate, ArrayList imageList) {
         try {
             SQLiteDatabase db = this.getWritableDatabase();
@@ -142,19 +156,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             int EventID = cursor.getInt(0);
 
             //add images
-            for(int i = 0 ; i<imageList.size(); i++){
+            for (int i = 0; i < imageList.size(); i++) {
                 //get byte array for image aka blob
                 byte[] data = getBitmapAsByteArray((Bitmap) imageList.get(i));
                 values = new ContentValues();
-                values.put("eventID",EventID);
-                values.put("picture",data);
+                values.put("eventID", EventID);
+                values.put("picture", data);
                 db.insert("EventPictureTable", null, values);
             }
 
             //add event to group
             values = new ContentValues();
-            values.put("eventID",EventID);
-            values.put("groupID",groupID);
+            values.put("eventID", EventID);
+            values.put("groupID", groupID);
             db.insert("GroupEventTable", null, values);
 
             db.close(); // Closing database connection
@@ -166,21 +180,74 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return -1;
     }
 
-    public ArrayList<String> GetGroupMembersName(int groupID){
-        SQLiteDatabase db = this.getWritableDatabase();
+    //used in createTask to populate groupMemberDropDown
+    public ArrayList<String> GetGroupMembersName(int groupID) {
+        try{
+            SQLiteDatabase db = this.getWritableDatabase();
 
-        ArrayList<String> al = new ArrayList<>();
+            ArrayList<String> al = new ArrayList<>();
 
-        Cursor cursor = db.rawQuery("SELECT firstName, LastName FROM UserTable " +
-                                     "INNER JOIN UserGroupTable on Usertable.phoneNumber " +
-                                    "= UserGroupTable.phoneNumber WHERE groupID = " + groupID, null);
+            Cursor cursor = db.rawQuery("SELECT firstName, LastName FROM UserTable " +
+                    "INNER JOIN UserGroupTable on Usertable.phoneNumber " +
+                    "= UserGroupTable.phoneNumber WHERE groupID = " + groupID, null);
 
-        while(cursor.moveToNext()){
-            al.add(cursor.getString(0) + " " + cursor.getString(1));
+            while (cursor.moveToNext()) {
+                al.add(cursor.getString(0) + " " + cursor.getString(1));
+            }
+            cursor.close();
+            Log.i(LOGTAG, "succesfully got groupmember ");
+            return al;
+        }catch (Exception e){
+            Log.i(LOGTAG, "Failed to get groupmember " + e.toString());
         }
-        return al;
+        return null;
     }
 
+    //used in completeTask to return task data
+    public String[] GetTaskInfo(int taskID){
+        try{
+            String[] sa = new String[5];
+
+            SQLiteDatabase db = this.getWritableDatabase();
+            Cursor cursor = db.rawQuery("SELECT * FROM EventTable where eventID = " + taskID, null);
+
+            cursor.moveToFirst();
+            sa[0] = cursor.getString(1);
+            sa[1] = cursor.getString(2);
+            sa[2] = cursor.getString(3);
+            sa[3] = cursor.getString(4);
+            sa[4] = cursor.getString(5);
+            cursor.close();
+            Log.i(LOGTAG, "Succesfully Got Task Info");
+            return sa;
+        }catch (Exception e){
+            Log.i(LOGTAG, "Failed to get TaskInfo " + e.toString());
+            return null;
+        }
+    }
+
+    //used in complete Task
+    public ArrayList GetImages(int taskID){
+        try{
+            ArrayList<Bitmap> bl = new ArrayList<>();
+
+            SQLiteDatabase db = this.getWritableDatabase();
+            Cursor cursor = db.rawQuery("SELECT picture FROM EventPictureTable where eventID = " + taskID, null);
+
+            while(cursor.moveToNext()){
+                byte[] imgByte = cursor.getBlob(0);
+                bl.add(BitmapFactory.decodeByteArray(imgByte,0,imgByte.length));
+            }
+            cursor.close();
+            Log.i(LOGTAG, "Succesfully Got images");
+            return bl;
+        }catch (Exception e){
+            Log.i(LOGTAG, "Failed to get images " + e.toString());
+            return null;
+        }
+    }
+
+    //used to convert bitmaps to byteArray for storage
     public static byte[] getBitmapAsByteArray(Bitmap bitmap) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);

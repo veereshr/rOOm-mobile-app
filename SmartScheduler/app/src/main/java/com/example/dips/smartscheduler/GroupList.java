@@ -34,7 +34,8 @@ public class GroupList extends AppCompatActivity {
 
                 //TODO FILL THIS IN WITH REAL Group DATA
                 SharedPreferences.Editor editor = getSharedPreferences("Data", MODE_PRIVATE).edit();
-                editor.putInt("groupID", 0);
+                //TODO NOTICE THAT WE START COUNTING FROM 1 NOT 0
+                editor.putInt("groupID", 1);
                 editor.commit();
 
                 Intent intent = new Intent(getApplicationContext(), ViewTask.class);

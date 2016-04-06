@@ -34,7 +34,8 @@ public class ViewTask extends AppCompatActivity {
 
                 //TODO FILL THIS IN WITH REAL task DATA
                 SharedPreferences.Editor editor = getSharedPreferences("Data", MODE_PRIVATE).edit();
-                editor.putInt("eventID", 0);
+                //TODO NOTICE THAT WE START COUNTING FROM 1 NOT 0
+                editor.putInt("eventID", 1);
                 editor.commit();
 
                 Intent intent = new Intent(getApplicationContext(), ViewSingleTask.class);

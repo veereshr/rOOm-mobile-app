@@ -45,21 +45,24 @@ public class CreateAccount extends AppCompatActivity {
             if (!pass.equals(passCon)) {
                 Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show();
             } else {
-                //TODO CHECK IF USER ALREADY EXIST
 
-                //save to db
                 DatabaseHelper dbhelper = new DatabaseHelper(this);
-                if(dbhelper.InsertNewUser(pNum, pass, fName, lName, email) != -1){
-                    Toast.makeText(v.getContext(), "Account Created", Toast.LENGTH_SHORT).show();
 
-                    //passing intent
-                    Intent intent = new Intent(v.getContext(), LogIn.class);
-                    startActivity(intent);
+                //TODO CHECK IF USER ALREADY EXIST
+                if(dbhelper.checkIfUserExist(pNum)){
+                    Toast.makeText(v.getContext(), "Phone number already exist", Toast.LENGTH_SHORT).show();
                 }else{
-                    Toast.makeText(v.getContext(), "Error saving to database", Toast.LENGTH_SHORT).show();
+                    //save to db
+                    if(dbhelper.InsertNewUser(pNum, pass, fName, lName, email) != -1){
+                        Toast.makeText(v.getContext(), "Account Created", Toast.LENGTH_SHORT).show();
+
+                        //passing intent
+                        Intent intent = new Intent(v.getContext(), LogIn.class);
+                        startActivity(intent);
+                    }else{
+                        Toast.makeText(v.getContext(), "Error saving to database", Toast.LENGTH_SHORT).show();
+                    }
                 }
-
-
             }
         }
     }
