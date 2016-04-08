@@ -4,11 +4,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import java.sql.Struct;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,13 +21,28 @@ public class GroupList extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_list);
 
+
+        SharedPreferences prefs = getSharedPreferences("Data", MODE_PRIVATE);
+        int phoneNumber = prefs.getInt("phoneNumber", 1);
+
+        //populate list
+        DatabaseHelper dbHelper=new DatabaseHelper(this);
+
+
+        String[] groupNames=dbHelper.getGroupList(phoneNumber);
+
         //populate list
         ListView viewListTask=(ListView)findViewById(R.id.viewGroupListView);
-        List<String> tasks=new ArrayList<>();
-        tasks.add("Group 1");
-        tasks.add("Group 2");
-        tasks.add("Group 3");
-        ArrayAdapter tasksAdapter= new ArrayAdapter<>(this, android.R.layout.simple_expandable_list_item_1, tasks) ;
+        List<String> groupList=new ArrayList<>();
+
+        int gLength=groupNames.length;
+        //add groupNames to the list
+        for(int i=0;i<groupNames.length;i++) {
+            groupList.add(groupNames[i]);
+        }
+		
+		
+        ArrayAdapter tasksAdapter= new ArrayAdapter<>(this, android.R.layout.simple_expandable_list_item_1, groupList) ;
         viewListTask.setAdapter(tasksAdapter);
         //set on click true
         viewListTask.setOnItemClickListener(new AdapterView.OnItemClickListener() {

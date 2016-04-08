@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -19,14 +20,24 @@ public class ViewTask extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_task);
 
+        SharedPreferences prefs = getSharedPreferences("Data", MODE_PRIVATE);
+        int phoneNumber = prefs.getInt("phoneNumber", 1);
+
+        DatabaseHelper dbHelper=new DatabaseHelper(this);
+
+        String[] eventNames=dbHelper.getTaskList(phoneNumber);
+
+
+        //populate list
         ListView viewListTask=(ListView)findViewById(R.id.viewTaskListView);
-        List<String> tasks=new ArrayList<String>();
+        List<String> eventList=new ArrayList<>();
 
-        tasks.add("Cooking");
-        tasks.add("Dish Wash");
-        tasks.add("Room Cleaning");
+        //add eventNames to the list
+        for(int i=0;i<eventNames.length;i++) {
+            eventList.add(eventNames[i]);
+        }
 
-        ArrayAdapter tasksAdapter= new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, (List<String>) tasks) ;
+        ArrayAdapter tasksAdapter= new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1,eventList) ;
         viewListTask.setAdapter(tasksAdapter);
         viewListTask.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
