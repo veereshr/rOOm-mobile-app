@@ -70,6 +70,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "groupName TEXT," +
                     "groupDesp TEXT);";
 
+	
+	
+    //SQL Statement to get GroupNames Details.
+    private static final String GROUPTABLE_DETAILS=
+            "SELECT groupName FROM GroupTable " +
+                    "INNER JOIN UserGroupTable on GroupTable.groupID = UserGroupTable.groupID "+
+                    "WHERE phoneNumber=";
+
+
+
+    //SQL Statement to get GroupNames Details.
+    private static final String GROUPEVENTTABLE_DETAILS=
+            "SELECT eventTitle from EventTable where eventID IN " +
+                    "(SELECT eventID FROM GroupEventTable NATURAL JOIN UserGroupTable " +
+                    "WHERE phoneNumber=";
+
+
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -253,4 +270,68 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
         return outputStream.toByteArray();
     }
+
+
+	
+	
+    //used in GroupList.java to display list of all groups
+    public String[] getGroupList(int phnNumber){
+        try
+        {
+            SQLiteDatabase db = this.getWritableDatabase();
+
+            //get the cursor to the GroupTable
+            Cursor cursor = db.rawQuery(GROUPTABLE_DETAILS+String.valueOf(phnNumber), null);
+            //count the number of rows
+            int rowNum=cursor.getCount();
+
+            String[] groupNames = new String[rowNum];
+
+            int i=0;
+            while (cursor.moveToNext()){  // get the data into array, or class variable
+                    groupNames[i]=cursor.getString(0);
+                    i++;
+                }
+
+            cursor.close();
+            db.close();
+            Log.i(LOGTAG, "Successfully Fetched GroupNames");
+            return groupNames;
+        }catch(Exception e){
+            Log.i(LOGTAG, "Failed to Fetch GroupNames " + e.toString());
+            return null;
+        }
+    }
+
+
+    //used in ViewTask.java to display list of all groups
+    public String[] getTaskList(int phnNumber){
+        try
+        {
+            SQLiteDatabase db = this.getWritableDatabase();
+
+            //get the cursor
+            Cursor cursor = db.rawQuery(GROUPEVENTTABLE_DETAILS+String.valueOf(phnNumber)+")", null);
+
+            //count the number of rows
+            int rowNum=cursor.getCount();
+
+            String[] eventNames = new String[rowNum];
+
+            int i=0;
+            while (cursor.moveToNext()){  // get the data into array, or class variable
+                eventNames[i]=cursor.getString(0);
+                i++;
+            }
+
+            cursor.close();
+            db.close();
+            Log.i(LOGTAG, "Successfully Fetched EventNames");
+            return eventNames;
+        }catch(Exception e){
+            Log.i(LOGTAG, "Failed to Fetch EventNames " + e.toString());
+            return null;
+        }
+    }
+
 }
