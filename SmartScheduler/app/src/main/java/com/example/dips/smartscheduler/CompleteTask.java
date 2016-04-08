@@ -21,6 +21,8 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import android.database.Cursor;
 import android.util.Log;
+import android.widget.Toast;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -156,7 +158,15 @@ public class CompleteTask extends AppCompatActivity {
     }
 
     public void CompleteTest(View view){
-        //TODO
+        SharedPreferences prefs = getSharedPreferences("Data", MODE_PRIVATE);
+        String comments = ((TextView) findViewById(R.id.completeTaskDesc)).getText().toString();
+        int taskID = prefs.getInt("eventID", 1);
+        DatabaseHelper dbhelper = new DatabaseHelper(this);
+        if(dbhelper.completeTask(taskID,comments,imageList) == -1){
+            Toast.makeText(this,"Error saving to database",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Toast.makeText(this,"Task Completed",Toast.LENGTH_SHORT).show();
         backToViewTasks();
     }
 

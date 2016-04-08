@@ -34,9 +34,10 @@
                 android:textColor="@color/colorText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Phone Number" />
+                android:text="Phone Number *" />
 
             <EditText
+                android:inputType="number"
                 android:textSize="@dimen/regular_font_size"
                 android:textColor="@color/colorText"
                 android:singleLine="true"
@@ -49,7 +50,7 @@
                 android:textColor="@color/colorText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="First Name" />
+                android:text="First Name *" />
 
             <EditText
                 android:textSize="@dimen/regular_font_size"
@@ -79,7 +80,7 @@
                 android:textColor="@color/colorText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Password" />
+                android:text="Password *" />
 
             <EditText
                 android:textSize="@dimen/regular_font_size"
@@ -96,7 +97,7 @@
                 android:textColor="@color/colorText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Confirm Password" />
+                android:text="Confirm Password *" />
 
             <EditText
                 android:textSize="@dimen/regular_font_size"

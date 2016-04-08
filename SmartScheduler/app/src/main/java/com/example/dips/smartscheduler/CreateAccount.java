@@ -35,34 +35,47 @@ public class CreateAccount extends AppCompatActivity {
 
         //validate Data
         //Removes all non numbers from phonenumber
-        pNum = pNum.replaceAll("[^\\d.]", "");
-        ((TextView) findViewById(R.id.phoneText)).setText(pNum);
+        int foo = pNum.length();
         //check phonenumber length
         if (pNum.length() < 1) {
             Toast.makeText(this, "Phone number can not be empty", Toast.LENGTH_SHORT).show();
-        } else {
-            //check if password match
-            if (!pass.equals(passCon)) {
-                Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show();
-            } else {
+            return;
+        }
+        pNum = pNum.replaceAll("[^\\d.]", "");
+        ((TextView) findViewById(R.id.phoneText)).setText(pNum);
+        if(foo < pNum.length()) {
+            Toast.makeText(this, "Phone number changed to " + pNum, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        //check name
+        if (fName == null || fName.length() < 1) {
+            Toast.makeText(this, "Name can not be empty", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(pass == null || pass.length()<1){
+            Toast.makeText(this, "Passwords can not be empty", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        //check if password match
+        if (!pass.equals(passCon)) {
+            Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-                DatabaseHelper dbhelper = new DatabaseHelper(this);
+        DatabaseHelper dbhelper = new DatabaseHelper(this);
 
-                //TODO CHECK IF USER ALREADY EXIST
-                if(dbhelper.checkIfUserExist(pNum)){
-                    Toast.makeText(v.getContext(), "Phone number already exist", Toast.LENGTH_SHORT).show();
-                }else{
-                    //save to db
-                    if(dbhelper.InsertNewUser(pNum, pass, fName, lName, email) != -1){
-                        Toast.makeText(v.getContext(), "Account Created", Toast.LENGTH_SHORT).show();
+        if(dbhelper.checkIfUserExist(pNum)){
+            Toast.makeText(v.getContext(), "Phone number already exist", Toast.LENGTH_SHORT).show();
+        }else{
+            //save to db
+            if(dbhelper.InsertNewUser(pNum, pass, fName, lName, email) != -1){
+                Toast.makeText(v.getContext(), "Account Created", Toast.LENGTH_SHORT).show();
 
-                        //passing intent
-                        Intent intent = new Intent(v.getContext(), LogIn.class);
-                        startActivity(intent);
-                    }else{
-                        Toast.makeText(v.getContext(), "Error saving to database", Toast.LENGTH_SHORT).show();
-                    }
-                }
+                //passing intent
+                Intent intent = new Intent(v.getContext(), LogIn.class);
+                startActivity(intent);
+            }else{
+                Toast.makeText(v.getContext(), "Error saving to database", Toast.LENGTH_SHORT).show();
             }
         }
     }
