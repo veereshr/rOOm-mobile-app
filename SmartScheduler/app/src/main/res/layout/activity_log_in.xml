@@ -72,7 +72,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/passTextLogin"
-                android:paddingBottom="@dimen/activity_regular_padding" />
+                android:paddingBottom="@dimen/activity_regular_padding"
+                android:inputType="textPassword" />
 
 
             <TextView
