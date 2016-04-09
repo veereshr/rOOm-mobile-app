@@ -2,9 +2,8 @@ package com.example.dips.smartscheduler;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -55,7 +54,9 @@ public class ViewTask extends AppCompatActivity {
                 SharedPreferences.Editor editor = getSharedPreferences("Data", MODE_PRIVATE).edit();
                 //TODO NOTICE THAT WE START COUNTING FROM 1 NOT 0
                 editor.putInt("eventID", 1);
+                editor.putInt("position",position);
                 editor.commit();
+
 
                 Intent intent = new Intent(getApplicationContext(), ViewSingleTask.class);
                 startActivity(intent);
