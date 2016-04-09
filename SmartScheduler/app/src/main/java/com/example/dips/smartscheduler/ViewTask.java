@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,13 +21,20 @@ public class ViewTask extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_task);
 
+        //fetch phoneNumber through SharedPreferences
         SharedPreferences prefs = getSharedPreferences("Data", MODE_PRIVATE);
         int phoneNumber = prefs.getInt("phoneNumber", 1);
 
+        //create DatabaseHelper
         DatabaseHelper dbHelper=new DatabaseHelper(this);
 
         String[] eventNames=dbHelper.getTaskList(phoneNumber);
 
+        //set NOTASKDATA text view visibilty property
+        TextView txtNoGroup= (TextView) findViewById(R.id.txtViewTaskData);
+        if(eventNames.length==0){
+            txtNoGroup.setVisibility(View.VISIBLE);
+        }
 
         //populate list
         ListView viewListTask=(ListView)findViewById(R.id.viewTaskListView);

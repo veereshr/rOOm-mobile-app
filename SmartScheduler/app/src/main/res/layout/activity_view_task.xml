@@ -9,38 +9,62 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.dips.smartscheduler.ViewTask">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="All Tasks"
-        android:id="@+id/txtViewTask"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal">
 
-    <ListView
-        android:layout_width="wrap_content"
-        android:layout_height="400dp"
-        android:id="@+id/viewTaskListView"
-        android:layout_below="@+id/txtViewTask"
-        android:layout_centerHorizontal="true" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="All Tasks"
+            android:id="@+id/txtViewTask"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:textSize="25dp" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Back"
-        android:id="@+id/btnAllTaskBack"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:onClick="BackToGroupList"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="NO TASK FOUND"
+            android:id="@+id/txtViewTaskData"
+            android:layout_gravity="center_horizontal"
+            android:textSize="@dimen/regular_font_size"
+            android:visibility="invisible"
+            android:background="#e98787" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="add"
-        android:id="@+id/btnAllTaskAdd"
-        android:layout_alignParentBottom="true"
-        android:layout_alignEnd="@+id/viewTaskListView"
-        android:onClick="CreateAccount"/>
+        <ListView
+            android:layout_width="wrap_content"
+            android:layout_height="400dp"
+            android:id="@+id/viewTaskListView"
+            android:layout_below="@+id/txtViewTask"
+            android:layout_centerHorizontal="true" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Back"
+                android:id="@+id/btnAllTaskBack"
+                android:layout_alignParentStart="true"
+                android:onClick="BackToGroupList"
+                android:layout_alignParentLeft="true" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="add"
+                android:id="@+id/btnAllTaskAdd"
+                android:onClick="CreateAccount"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true" />
+        </RelativeLayout>
+    </LinearLayout>
 
 </RelativeLayout>

@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.sql.Struct;
 import java.util.ArrayList;
@@ -21,15 +22,19 @@ public class GroupList extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_list);
 
-
+        //fetch phoneNumber through SharedPreferences
         SharedPreferences prefs = getSharedPreferences("Data", MODE_PRIVATE);
         int phoneNumber = prefs.getInt("phoneNumber", 1);
 
-        //populate list
+        //create DatabaseHelper
         DatabaseHelper dbHelper=new DatabaseHelper(this);
-
-
         String[] groupNames=dbHelper.getGroupList(phoneNumber);
+
+        //set NOGROUPDATA text view visibilty property
+        TextView txtNoGroup= (TextView) findViewById(R.id.txtViewGroupData);
+        if(groupNames.length==0){
+            txtNoGroup.setVisibility(View.VISIBLE);
+        }
 
         //populate list
         ListView viewListTask=(ListView)findViewById(R.id.viewGroupListView);
@@ -44,6 +49,7 @@ public class GroupList extends AppCompatActivity {
 		
         ArrayAdapter tasksAdapter= new ArrayAdapter<>(this, android.R.layout.simple_expandable_list_item_1, groupList) ;
         viewListTask.setAdapter(tasksAdapter);
+
         //set on click true
         viewListTask.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
