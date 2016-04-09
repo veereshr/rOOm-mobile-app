@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteStatement;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.nfc.Tag;
@@ -199,7 +200,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //used in createTask to populate groupMemberDropDown
     public ArrayList<String> GetGroupMembersName(int groupID) {
-        try{
+        try {
             SQLiteDatabase db = this.getWritableDatabase();
 
             ArrayList<String> al = new ArrayList<>();
@@ -212,17 +213,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 al.add(cursor.getString(0) + " " + cursor.getString(1));
             }
             cursor.close();
-            Log.i(LOGTAG, "succesfully got groupmember ");
+            Log.i(LOGTAG, "successfully got group member ");
             return al;
-        }catch (Exception e){
-            Log.i(LOGTAG, "Failed to get groupmember " + e.toString());
+        } catch (Exception e) {
+            Log.i(LOGTAG, "Failed to get group member " + e.toString());
         }
         return null;
     }
 
     //used in completeTask to return task data
-    public String[] GetTaskInfo(int taskID){
-        try{
+    public String[] GetTaskInfo(int taskID) {
+        try {
             String[] sa = new String[5];
 
             SQLiteDatabase db = this.getWritableDatabase();
@@ -235,30 +236,56 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             sa[3] = cursor.getString(4);
             sa[4] = cursor.getString(5);
             cursor.close();
-            Log.i(LOGTAG, "Succesfully Got Task Info");
+            Log.i(LOGTAG, "Successfully Got Task Info");
             return sa;
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.i(LOGTAG, "Failed to get TaskInfo " + e.toString());
             return null;
         }
     }
 
+    public int completeTask(int EventID, String comments, ArrayList imageList) {
+        try {
+            SQLiteDatabase db = this.getWritableDatabase();
+
+            SQLiteStatement insertStatement = db.compileStatement("UPDATE EventTable SET comment = ? WHERE eventID = ?");
+            insertStatement.bindString(1, comments);
+            insertStatement.bindString(2, EventID + "");
+            insertStatement.executeInsert();
+
+            //add images
+            for (int i = 0; i < imageList.size(); i++) {
+                //get byte array for image aka blob
+                byte[] data = getBitmapAsByteArray((Bitmap) imageList.get(i));
+                ContentValues values = new ContentValues();
+                values.put("eventID", EventID);
+                values.put("picture", data);
+                db.insert("EventPictureTable", null, values);
+            }
+            Log.i(LOGTAG, "successfully edited task ");
+            return 1;
+        } catch (Exception e) {
+            Log.i(LOGTAG, "Failed to edited task " + e.toString());
+        }
+        return -1;
+    }
+
     //used in complete Task
-    public ArrayList GetImages(int taskID){
-        try{
+    public ArrayList GetImages(int taskID) {
+        try {
             ArrayList<Bitmap> bl = new ArrayList<>();
 
             SQLiteDatabase db = this.getWritableDatabase();
             Cursor cursor = db.rawQuery("SELECT picture FROM EventPictureTable where eventID = " + taskID, null);
 
-            while(cursor.moveToNext()){
+            while (cursor.moveToNext()) {
                 byte[] imgByte = cursor.getBlob(0);
-                bl.add(BitmapFactory.decodeByteArray(imgByte,0,imgByte.length));
+                bl.add(BitmapFactory.decodeByteArray(imgByte, 0, imgByte.length));
             }
             cursor.close();
-            Log.i(LOGTAG, "Succesfully Got images");
+            Log.i(LOGTAG, "Successfully Got images");
             return bl;
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.i(LOGTAG, "Failed to get images " + e.toString());
             return null;
         }
