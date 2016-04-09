@@ -8,12 +8,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.nfc.Tag;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Jorge on 3/31/2016.
@@ -71,8 +69,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "groupName TEXT," +
                     "groupDesp TEXT);";
 
-	
-	
+
+
     //SQL Statement to get GroupNames Details.
     private static final String GROUPTABLE_DETAILS=
             "SELECT groupName FROM GroupTable " +
@@ -87,6 +85,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "(SELECT eventID FROM GroupEventTable NATURAL JOIN UserGroupTable " +
                     "WHERE phoneNumber=";
 
+
+    //SQL Statement to check the login credentials
+    private static final String CHECK_LOGIN = "SELECT phoneNumber from UserTable where phoneNumber=";
+
+    // SQL Statement to get Event Details
+    private static final String EVENTTABLE_DETAILS=
+            "SELECT eventTitle, eventDescription, assignTo, dueDate from EventTable where eventID IN " +
+                    "(SELECT eventID FROM GroupEventTable NATURAL JOIN UserGroupTable " +
+                    "WHERE phoneNumber=";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -152,6 +159,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return false;
     }
+
+    //used in LogIn to check if user is valid
+    public boolean checkIfValidUser(String[] credentials) {
+        try {
+            SQLiteDatabase db;
+            db = this.getReadableDatabase();
+            Log.i("Phone Number",credentials[1]);
+            Cursor cursor = db.rawQuery("SELECT phoneNumber FROM UserTable WHERE phoneNumber = "+credentials[0]+" and password = "+credentials[1], null);
+            return cursor.moveToFirst();
+        } catch (Exception e) {
+            Log.i(LOGTAG, "Failed to check if user is valid " + e.toString());
+        }
+        return false;
+    }
+
+
 
     //used in createTask to build out task and add pictures and put in group
     public int InsertNewTask(int groupID, String title, String desc, String assignedTo, String date, String startDate, ArrayList imageList) {
@@ -299,8 +322,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-	
-	
+
+
     //used in GroupList.java to display list of all groups
     public String[] getGroupList(int phnNumber){
         try
@@ -361,4 +384,56 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    //used in ViewSingleTask.java to display the details of single task
+    public String[] getTaskDetails(int phnNumber, int position) {
+        try {
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            //get the cursor
+            Cursor cursor = db.rawQuery(EVENTTABLE_DETAILS + String.valueOf(phnNumber) + ")", null);
+
+            //count the number of rows
+            int rowNum = cursor.getCount();
+
+            String taskTitle;
+            String taskDescription;
+            String user;
+            String date;
+            String[] taskDetails;
+
+            int i = 0;
+            if(position!=0){
+                while (cursor.moveToNext()) {  // get the data into array, or class variable
+                    i++;
+                    if (position == i) {
+                        break;
+                    }
+                }
+            }
+            cursor.moveToNext();
+
+            if (i == position) {
+                taskTitle = cursor.getString(0);
+                taskDescription = cursor.getString(1);
+                user = cursor.getString(2);
+                date = cursor.getString(3);
+
+                taskDetails = new String[]{taskTitle, taskDescription, user, date};
+                cursor.close();
+                db.close();
+                Log.i(LOGTAG, "Successfully Fetched Event Details");
+                return taskDetails;
+            } else {
+                Log.i(LOGTAG, "Problem in fetching event details");
+            }
+
+        } catch (Exception e) {
+            Log.i(LOGTAG, "Failed to Fetch event details " + e.toString());
+            return null;
+        }
+        return null;
+    }
 }
+
+
+
