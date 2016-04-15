@@ -1,5 +1,6 @@
 package com.example.dips.smartscheduler;
 
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -8,9 +9,27 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 /**
@@ -20,7 +39,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String LOGTAG = "OurDB";
     private static final String DATABASE_NAME = "Room.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     // SQL Statement to create UserTable.
     private static final String USERTABLE_CREATE =
@@ -31,17 +50,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "lastName TEXT, " +
                     "email TEXT);";
 
-    // SQL Statement to create UserGroupTable.
-    private static final String USERGROUPTABLE_CREATE =
-            "CREATE TABLE UserGroupTable( " +
-                    "phoneNumber TEXT," +
-                    "groupID INTEGER);";
-
-    // SQL Statement to create GroupEventTable.
-    private static final String GROUPEVENTTABLE_CREATE =
+    // SQL Statement to create EventUserTable.
+    private static final String EVENTUSERTABLE_CREATE =
             "CREATE TABLE GroupEventTable( " +
                     "groupID INTEGER," +
-                    "eventID INTEGER);";
+                    "phoneNumber TEXT);";
 
     // SQL Statement to create EventTable.
     private static final String EVENTTABLE_CREATE =
@@ -61,14 +74,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "CREATE TABLE EventPictureTable( " +
                     "eventID INTEGER," +
                     "picture BLOB);";
-
-    // SQL Statement to create GroupTable.
-    private static final String GROUPTABLE_CREATE =
-            "CREATE TABLE GroupTable( " +
-                    "groupID INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "groupName TEXT," +
-                    "groupDesp TEXT);";
-
 
 
     //SQL Statement to get GroupNames Details.
@@ -95,19 +100,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "(SELECT eventID FROM GroupEventTable NATURAL JOIN UserGroupTable " +
                     "WHERE phoneNumber=";
 
+    private Context context;
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        this.context = context;
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         //create all tables
         db.execSQL(USERTABLE_CREATE);
-        db.execSQL(USERGROUPTABLE_CREATE);
-        db.execSQL(GROUPEVENTTABLE_CREATE);
+        db.execSQL(EVENTUSERTABLE_CREATE);
         db.execSQL(EVENTTABLE_CREATE);
         db.execSQL(EVENTPICTURETABLE_CREATE);
-        db.execSQL(GROUPTABLE_CREATE);
         Log.i(LOGTAG, "TABLES CREATED");
     }
 
@@ -116,11 +121,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Log.i(LOGTAG, "Upgrading");
         //onUpgrade Drop all old tables and remake
         db.execSQL("DROP TABLE IF EXISTS " + USERTABLE_CREATE);
-        db.execSQL("DROP TABLE IF EXISTS " + USERGROUPTABLE_CREATE);
-        db.execSQL("DROP TABLE IF EXISTS " + GROUPEVENTTABLE_CREATE);
         db.execSQL("DROP TABLE IF EXISTS " + EVENTTABLE_CREATE);
         db.execSQL("DROP TABLE IF EXISTS " + EVENTPICTURETABLE_CREATE);
-        db.execSQL("DROP TABLE IF EXISTS " + GROUPTABLE_CREATE);
         onCreate(db);
     }
 
@@ -159,22 +161,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return false;
     }
-
-    //used in LogIn to check if user is valid
-    public boolean checkIfValidUser(String[] credentials) {
-        try {
-            SQLiteDatabase db;
-            db = this.getReadableDatabase();
-            Log.i("Phone Number",credentials[1]);
-            Cursor cursor = db.rawQuery("SELECT phoneNumber FROM UserTable WHERE phoneNumber = "+credentials[0]+" and password = "+credentials[1], null);
-            return cursor.moveToFirst();
-        } catch (Exception e) {
-            Log.i(LOGTAG, "Failed to check if user is valid " + e.toString());
-        }
-        return false;
-    }
-
-
 
     //used in createTask to build out task and add pictures and put in group
     public int InsertNewTask(int groupID, String title, String desc, String assignedTo, String date, String startDate, ArrayList imageList) {
@@ -339,9 +325,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             int i=0;
             while (cursor.moveToNext()){  // get the data into array, or class variable
-                    groupNames[i]=cursor.getString(0);
-                    i++;
-                }
+                groupNames[i]=cursor.getString(0);
+                i++;
+            }
 
             cursor.close();
             db.close();
@@ -371,7 +357,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             int i=0;
             while (cursor.moveToNext()){  // get the data into array, or class variable
                 eventNames[i]=cursor.getString(0);
-                Log.d(String.valueOf(i)+ "~>",eventNames[i]);
                 i++;
             }
 
@@ -383,6 +368,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Log.i(LOGTAG, "Failed to Fetch EventNames " + e.toString());
             return null;
         }
+    }
+
+    public int CreateGroup(String name, String desc, String phoneNumber){
+        try{
+            SQLiteDatabase db = this.getWritableDatabase();
+
+            ContentValues values = new ContentValues();
+            values.put("groupName", name);
+            values.put("groupDesp", desc);
+            db.insert("GroupTable", null, values);
+
+            //get the inserted events ID
+            Cursor cursor = db.rawQuery("SELECT last_insert_rowid();", null);
+            cursor.moveToFirst();
+            int groupID = cursor.getInt(0);
+
+            values = new ContentValues();
+            values.put("groupID", groupID);
+            values.put("phoneNumber", phoneNumber);
+            db.insert("UserGroupTable", null, values);
+
+            Log.i(LOGTAG, "Successfully created group ");
+            return 1;
+        }catch (Exception e){
+            Log.i(LOGTAG, "Failed to create group " + e.toString());
+        }
+        return -1;
     }
 
     //used in ViewSingleTask.java to display the details of single task
@@ -434,7 +446,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return null;
     }
-}
 
+    public void SyncDB(){
+        SQLiteDatabase db = this.getReadableDatabase();
+        new SyncDB(context).execute(db, null, null);
+    }
+}
 
 
