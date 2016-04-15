@@ -7,70 +7,99 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:background="@drawable/bg3">
+    tools:context="com.example.dips.smartscheduler.CreateGroup">
 
     <ScrollView
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/activity_regular_padding"
-        android:paddingRight="@dimen/activity_regular_padding"
-        android:paddingLeft="@dimen/activity_regular_padding">
+        android:id="@+id/scrollView2" >
 
-        <LinearLayout
-            android:orientation="vertical"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/backGroundColor"
-            android:padding="@dimen/activity_regular_padding">
+            android:layout_height="match_parent">
 
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
                 android:text="Create Group"
-                android:textSize="@dimen/title_font_size"
-                android:textColor="@color/colorText"
-                android:textAlignment="center"
-                android:paddingBottom="@dimen/activity_regular_padding" />
+                android:id="@+id/txtCreateGroup"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true" />
 
             <TextView
-                android:textSize="@dimen/regular_font_size"
-                android:textColor="@color/colorText"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Group Name :"
-                android:id="@+id/txtViewGroupName" />
+                android:id="@+id/txtViewGroupName"
+                android:layout_alignBaseline="@+id/edtTextGroupName"
+                android:layout_alignParentStart="true" />
 
             <EditText
-                android:textSize="@dimen/regular_font_size"
-                android:textColor="@color/colorText"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/edtTextGroupName" />
+                android:id="@+id/edtTextGroupName"
+                android:layout_below="@+id/txtCreateGroup"
+                android:layout_alignParentEnd="true"
+                android:layout_toEndOf="@+id/txtViewGroupName" />
 
             <TextView
-                android:textSize="@dimen/regular_font_size"
-                android:textColor="@color/colorText"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Group Description :"
-                android:id="@+id/txtViewGroupDesc" />
+                android:id="@+id/txtViewGroupDesc"
+                android:layout_below="@+id/edtTextGroupName"
+                android:layout_alignParentStart="true" />
 
             <EditText
-                android:textSize="@dimen/regular_font_size"
-                android:textColor="@color/colorText"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/edtTextGroupDesc" />
+                android:id="@+id/edtTextGroupDesc"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/txtViewGroupDesc"
+                android:layout_alignEnd="@+id/edtTextGroupName" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="View :"
+                android:id="@+id/txtViewView"
+                android:layout_below="@+id/edtTextGroupDesc"
+                android:layout_alignParentStart="true" />
+
+            <Spinner
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/dropDownViewName"
+                android:spinnerMode="dropdown"
+                android:layout_below="@+id/txtViewView"
+                android:layout_alignParentStart="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Post :"
+                android:id="@+id/txtViewPost"
+                android:layout_below="@+id/dropDownViewName"
+                android:layout_alignParentStart="true" />
+
+            <Spinner
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/dropDownPostName"
+                android:spinnerMode="dropdown"
+                android:layout_below="@+id/txtViewPost"
+                android:layout_alignParentStart="true" />
 
             <Button
-                android:textSize="@dimen/regular_font_size"
-                android:textColor="@color/colorText"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Create Group"
                 android:id="@+id/btnCreateGroup"
+                android:layout_below="@+id/dropDownPostName"
+                android:layout_alignParentStart="true"
                 android:onClick="CreateGroup"/>
-        </LinearLayout>
-    </ScrollView>
 
+        </RelativeLayout>
+    </ScrollView>
 </RelativeLayout>

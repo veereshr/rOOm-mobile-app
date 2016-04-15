@@ -62,7 +62,7 @@ public class CreateAccount extends AppCompatActivity {
             return;
         }
 
-        DatabaseHelper dbhelper = new DatabaseHelper(this);
+        DatabaseHelper dbhelper = new DatabaseHelper(getApplicationContext());
 
         if(dbhelper.checkIfUserExist(pNum)){
             Toast.makeText(v.getContext(), "Phone number already exist", Toast.LENGTH_SHORT).show();

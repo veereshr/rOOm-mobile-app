@@ -371,6 +371,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             int i=0;
             while (cursor.moveToNext()){  // get the data into array, or class variable
                 eventNames[i]=cursor.getString(0);
+                Log.d(String.valueOf(i)+ "~>",eventNames[i]);
                 i++;
             }
 
@@ -382,33 +383,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Log.i(LOGTAG, "Failed to Fetch EventNames " + e.toString());
             return null;
         }
-    }
-
-    public int CreateGroup(String name, String desc, String phoneNumber){
-        try{
-            SQLiteDatabase db = this.getWritableDatabase();
-
-            ContentValues values = new ContentValues();
-            values.put("groupName", name);
-            values.put("groupDesp", desc);
-            db.insert("GroupTable", null, values);
-
-            //get the inserted events ID
-            Cursor cursor = db.rawQuery("SELECT last_insert_rowid();", null);
-            cursor.moveToFirst();
-            int groupID = cursor.getInt(0);
-
-            values = new ContentValues();
-            values.put("groupID", groupID);
-            values.put("phoneNumber", phoneNumber);
-            db.insert("UserGroupTable", null, values);
-            
-            Log.i(LOGTAG, "Successfully created group ");
-            return 1;
-        }catch (Exception e){
-            Log.i(LOGTAG, "Failed to create group " + e.toString());
-        }
-        return -1;
     }
 
     //used in ViewSingleTask.java to display the details of single task

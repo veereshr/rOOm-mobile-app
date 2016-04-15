@@ -59,7 +59,7 @@ public class CreateTask extends AppCompatActivity {
         int groupID = prefs.getInt("groupID", 1);
 
 
-        DatabaseHelper dbhelper = new DatabaseHelper(this);
+        DatabaseHelper dbhelper = new DatabaseHelper(getApplicationContext());
         List<String> listGroupItems = dbhelper.GetGroupMembersName(groupID);
         Spinner dropdown = (Spinner) findViewById(R.id.createTaskTeam);
         listGroupItems.add(0, "");
@@ -233,7 +233,7 @@ public class CreateTask extends AppCompatActivity {
 
         if (res != -1) {
             Toast.makeText(this, "Saved Task", Toast.LENGTH_SHORT).show();
-            Intent i = new Intent(getApplicationContext(), ViewTask.class);
+            Intent i = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(i);
         } else {
             Toast.makeText(this, "Error saving to database", Toast.LENGTH_SHORT).show();

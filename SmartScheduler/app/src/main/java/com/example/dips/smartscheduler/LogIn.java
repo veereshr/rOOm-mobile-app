@@ -39,7 +39,7 @@ try {
     if(dbhelper.checkIfValidUser(credentials)){
         editor.putInt("phoneNumber", phnNumber);
         editor.commit();
-        Intent intent = new Intent(v.getContext(), GroupList.class);
+        Intent intent = new Intent(v.getContext(), MainActivity.class);
         startActivity(intent);
     }
     else{
