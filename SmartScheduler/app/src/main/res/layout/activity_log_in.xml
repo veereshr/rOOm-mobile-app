@@ -58,7 +58,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/phoneTextLogIn"
                 android:paddingBottom="@dimen/activity_regular_padding"
-                android:inputType="phone" />
+                android:inputType="number" />
 
             <TextView
                 android:textColor="@color/colorText"

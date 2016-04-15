@@ -7,23 +7,30 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.dips.smartscheduler.ViewTask">
+    tools:context="com.example.dips.smartscheduler.ViewTask"
+    android:background="@drawable/bg2">
 
-    <LinearLayout
-        android:orientation="vertical"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center_horizontal">
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/activity_regular_padding"
+        android:paddingRight="@dimen/activity_regular_padding"
+        android:paddingLeft="@dimen/activity_regular_padding">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/backGroundColor"
+            android:padding="@dimen/activity_regular_padding">
 
         <TextView
+            android:textSize="@dimen/title_font_size"
+            android:textColor="@color/colorText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="All Tasks"
-            android:id="@+id/txtViewTask"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:textSize="25dp" />
+            android:id="@+id/txtViewTask" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -66,5 +73,6 @@
                 android:layout_alignParentEnd="true" />
         </RelativeLayout>
     </LinearLayout>
+</ScrollView>
 
 </RelativeLayout>
