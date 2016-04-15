@@ -29,7 +29,7 @@ import java.util.ArrayList;
 public class LogIn extends AppCompatActivity {
     EditText phnNumberTxt;
     EditText passTextLogin;
-    int phnNumber;
+    String phnNumber;
     String password;
 
     @Override
@@ -46,12 +46,12 @@ public class LogIn extends AppCompatActivity {
 
     public void LogIn(View v){
         try {
-            phnNumber = Integer.parseInt(phnNumberTxt.getText().toString());
+            phnNumber = phnNumberTxt.getText().toString();
             password = passTextLogin.getText().toString();
             String[] credentials = new String[] { phnNumber+"", password};
 
             SharedPreferences.Editor editor = getSharedPreferences("Data", MODE_PRIVATE).edit();
-            editor.putInt("phoneNumber", phnNumber);
+            editor.putString("phoneNumber", phnNumber);
             editor.commit();
 
             //check user on external db

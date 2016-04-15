@@ -23,7 +23,7 @@ public class MainActivity extends FragmentActivity {
         //setSupportActionBar(toolbar);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        tabLayout.addTab(tabLayout.newTab().setText("Group List"));
+        //tabLayout.addTab(tabLayout.newTab().setText("Group List"));
         tabLayout.addTab(tabLayout.newTab().setText("Task List"));
 /*        tabLayout.addTab(tabLayout.newTab().setText("Pending Task"));
 

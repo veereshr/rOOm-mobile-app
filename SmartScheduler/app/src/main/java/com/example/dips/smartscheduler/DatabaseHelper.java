@@ -52,8 +52,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // SQL Statement to create EventUserTable.
     private static final String EVENTUSERTABLE_CREATE =
-            "CREATE TABLE GroupEventTable( " +
-                    "groupID INTEGER," +
+            "CREATE TABLE EVENTUSERTABLE( " +
+                    "eventID INTEGER," +
                     "phoneNumber TEXT);";
 
     // SQL Statement to create EventTable.
@@ -81,18 +81,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "SELECT groupName FROM GroupTable " +
                     "INNER JOIN UserGroupTable on GroupTable.groupID = UserGroupTable.groupID "+
                     "WHERE phoneNumber=";
-
-
-
-    //SQL Statement to get GroupNames Details.
-    private static final String GROUPEVENTTABLE_DETAILS=
-            "SELECT eventTitle from EventTable where eventID IN " +
-                    "(SELECT eventID FROM GroupEventTable NATURAL JOIN UserGroupTable " +
-                    "WHERE phoneNumber=";
-
-
-    //SQL Statement to check the login credentials
-    private static final String CHECK_LOGIN = "SELECT phoneNumber from UserTable where phoneNumber=";
 
     // SQL Statement to get Event Details
     private static final String EVENTTABLE_DETAILS=
@@ -347,7 +335,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             SQLiteDatabase db = this.getWritableDatabase();
 
             //get the cursor
-            Cursor cursor = db.rawQuery(GROUPEVENTTABLE_DETAILS+String.valueOf(phnNumber)+")", null);
+            //SQL Statement to get GroupNames Details.
+            String SQLCALL=
+                    "SELECT eventTitle from EventTable where eventID IN " +
+                            "(SELECT eventID FROM EventUserTable NATURAL JOIN EventTable " +
+                            "WHERE phoneNumber=";
+            Cursor cursor = db.rawQuery(SQLCALL+String.valueOf(phnNumber)+")", null);
 
             //count the number of rows
             int rowNum=cursor.getCount();
