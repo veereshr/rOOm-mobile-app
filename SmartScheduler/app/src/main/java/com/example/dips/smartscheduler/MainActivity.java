@@ -1,15 +1,10 @@
 package com.example.dips.smartscheduler;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 
 public class MainActivity extends FragmentActivity {
 
@@ -23,13 +18,13 @@ public class MainActivity extends FragmentActivity {
         //setSupportActionBar(toolbar);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        //tabLayout.addTab(tabLayout.newTab().setText("Group List"));
         tabLayout.addTab(tabLayout.newTab().setText("Task List"));
+        tabLayout.addTab(tabLayout.newTab().setText("Completed Task"));
 /*        tabLayout.addTab(tabLayout.newTab().setText("Pending Task"));
 
 */
         final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-        final PagerAdapter1 adapter = new PagerAdapter1(getSupportFragmentManager(), tabLayout.getTabCount());
+        final TaskPagerAdapter adapter = new TaskPagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {

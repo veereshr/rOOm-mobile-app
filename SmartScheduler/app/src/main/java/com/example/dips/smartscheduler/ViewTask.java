@@ -30,9 +30,9 @@ public class ViewTask extends Fragment {
         TaskFragActivity = super.getActivity();
 
         SharedPreferences prefs = TaskFragActivity.getSharedPreferences("Data", 0x0000);
-        int phoneNumber = prefs.getInt("phoneNumber", 1);
+        String phoneNumber = prefs.getString("phoneNumber", "1");
 
-        Log.d("Phone Number :", String.valueOf(phoneNumber));
+        Log.d("Phone Number :", phoneNumber);
         //create DatabaseHelper
         DatabaseHelper dbHelper=new DatabaseHelper(this.getContext());
 

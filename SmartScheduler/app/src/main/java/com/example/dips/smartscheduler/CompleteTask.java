@@ -48,7 +48,7 @@ public class CompleteTask extends AppCompatActivity {
         ((TextView) findViewById(R.id.completeTaskTitle)).setText(listGroupItems[0]);
         ((TextView) findViewById(R.id.completeTaskDesc)).setText(listGroupItems[1]);
         ((TextView) findViewById(R.id.completeTaskDue)).setText(listGroupItems[2]);
-        
+
         //get todays date
         Calendar calendar = Calendar.getInstance();
         String finishDate = calendar.get(Calendar.MONTH)+"/"+calendar.get(Calendar.DAY_OF_MONTH)+"/"+calendar.get(Calendar.YEAR);
