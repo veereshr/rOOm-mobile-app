@@ -114,42 +114,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    //used in CreateAccount.java to make a new user
-    public int InsertNewUser(String phoneNumber, String password, String fName, String lName, String email) {
-        try {
-            SQLiteDatabase db = this.getWritableDatabase();
-
-            //fill values to prevent injection
-            ContentValues values = new ContentValues();
-            values.put("phoneNumber", phoneNumber);
-            values.put("password", password);
-            values.put("firstName", fName);
-            values.put("lastName", lName);
-            values.put("email", email);
-
-            // Inserting Row
-            db.insert("UserTable", null, values);
-            db.close(); // Closing database connection
-            Log.i(LOGTAG, "Successfully InsertNewUser");
-            return 1;
-        } catch (Exception e) {
-            Log.i(LOGTAG, "Failed to InsertNewUser " + e.toString());
-        }
-        return -1;
-    }
-
-    //used in createAccount to check if user already exist
-    public boolean checkIfUserExist(String pNum) {
-        try {
-            SQLiteDatabase db = this.getWritableDatabase();
-            Cursor cursor = db.rawQuery("SELECT * FROM UserTable WHERE phoneNumber = " + pNum, null);
-            return cursor.moveToNext();
-        } catch (Exception e) {
-            Log.i(LOGTAG, "Failed to check if user exist " + e.toString());
-        }
-        return false;
-    }
-
     //used in createTask to build out task and add pictures and put in group
     public int InsertNewTask(int groupID, String title, String desc, String assignedTo, String date, String startDate, ArrayList imageList) {
         try {
@@ -340,7 +304,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "SELECT eventTitle from EventTable where eventID IN " +
                             "(SELECT eventID FROM EventUserTable NATURAL JOIN EventTable " +
                             "WHERE phoneNumber=";
-            Cursor cursor = db.rawQuery(SQLCALL+String.valueOf(phnNumber)+")", null);
+            Cursor cursor = db.rawQuery(SQLCALL+String.valueOf(phnNumber)+" and completedDate IS NULL)", null);
 
             //count the number of rows
             int rowNum=cursor.getCount();
