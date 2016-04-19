@@ -3,15 +3,22 @@ package com.example.dips.smartscheduler;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Debug;
 import android.os.Environment;
+import android.provider.Contacts;
+import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -24,11 +31,27 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -41,6 +64,7 @@ public class CreateTask extends AppCompatActivity {
     private int yearNew, monthNew, dayNew;
     private Bitmap curimage;
     private ArrayList imageList = new ArrayList();
+    private ArrayList phoneNumbers = new ArrayList(); // people that are added
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,21 +77,6 @@ public class CreateTask extends AppCompatActivity {
         month = calendar.get(Calendar.MONTH);
         day = calendar.get(Calendar.DAY_OF_MONTH);
         showDate(year, month, day);
-
-        //get current group team members and fill spinner
-        SharedPreferences prefs = getSharedPreferences("Data", MODE_PRIVATE);
-        int groupID = prefs.getInt("groupID", 1);
-
-        //TODO CONTACTS
-        /*
-        DatabaseHelper dbhelper = new DatabaseHelper(getApplicationContext());
-        List<String> listGroupItems = dbhelper.GetGroupMembersName(groupID);
-        Spinner dropdown = (Spinner) findViewById(R.id.createTaskTeam);
-        listGroupItems.add(0, "");
-        ArrayAdapter<String> adapterGroupName = new ArrayAdapter<>(
-                this, android.R.layout.simple_spinner_dropdown_item, listGroupItems);
-        dropdown.setAdapter(adapterGroupName);
-        */
     }
 
     //used for Select Date
@@ -134,54 +143,77 @@ public class CreateTask extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
-            if (requestCode == 1) {
-                curimage = null;
-                File f = new File(Environment.getExternalStorageDirectory().toString());
-                for (File temp : f.listFiles()) {
-                    if (temp.getName().equals("temp.jpg")) {
-                        f = temp;
-                        break;
+            switch(requestCode){
+                case 1:
+                    curimage = null;
+                    File f = new File(Environment.getExternalStorageDirectory().toString());
+                    for (File temp : f.listFiles()) {
+                        if (temp.getName().equals("temp.jpg")) {
+                            f = temp;
+                            break;
+                        }
                     }
-                }
-                try {
-                    BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
-
-                    curimage = BitmapFactory.decodeFile(f.getAbsolutePath(),
-                            bitmapOptions);
-
-                    String path = android.os.Environment
-                            .getExternalStorageDirectory()
-                            + File.separator
-                            + "Phoenix" + File.separator + "default";
-                    f.delete();
-                    OutputStream outFile = null;
-                    File file = new File(path, String.valueOf(System.currentTimeMillis()) + ".jpg");
                     try {
-                        outFile = new FileOutputStream(file);
-                        curimage.compress(Bitmap.CompressFormat.JPEG, 85, outFile);
-                        outFile.flush();
-                        outFile.close();
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                        BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+
+                        curimage = BitmapFactory.decodeFile(f.getAbsolutePath(),
+                                bitmapOptions);
+
+                        String path = android.os.Environment
+                                .getExternalStorageDirectory()
+                                + File.separator
+                                + "Phoenix" + File.separator + "default";
+                        f.delete();
+                        OutputStream outFile = null;
+                        File file = new File(path, String.valueOf(System.currentTimeMillis()) + ".jpg");
+                        try {
+                            outFile = new FileOutputStream(file);
+                            curimage.compress(Bitmap.CompressFormat.JPEG, 85, outFile);
+                            outFile.flush();
+                            outFile.close();
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } else if (requestCode == 2) {
+                    break;
+                case 2:
+                    Uri selectedImage = data.getData();
+                    String[] filePath = {MediaStore.Images.Media.DATA};
+                    Cursor c = getContentResolver().query(selectedImage, filePath, null, null, null);
+                    c.moveToFirst();
+                    int columnIndex = c.getColumnIndex(filePath[0]);
+                    String picturePath = c.getString(columnIndex);
+                    c.close();
+                    curimage = (BitmapFactory.decodeFile(picturePath));
+                    Log.i("CompleteTask", picturePath + "");
+                    break;
+                case 3://contacts
+                    Uri contactUri = data.getData();
+                    String[] projection = {ContactsContract.CommonDataKinds.Phone.NUMBER};
+                    Cursor cursor = getContentResolver()
+                            .query(contactUri, projection, null, null, null);
+                    cursor.moveToFirst();
 
-                Uri selectedImage = data.getData();
-                String[] filePath = {MediaStore.Images.Media.DATA};
-                Cursor c = getContentResolver().query(selectedImage, filePath, null, null, null);
-                c.moveToFirst();
-                int columnIndex = c.getColumnIndex(filePath[0]);
-                String picturePath = c.getString(columnIndex);
-                c.close();
-                curimage = (BitmapFactory.decodeFile(picturePath));
-                Log.w("CompleteTask", picturePath + "");
+                    // Retrieve the phone number from the NUMBER column
+                    int column = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+                    String number = cursor.getString(column);
+                    //column = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
+                    //String name = cursor.getString(column);
+                    //TODO GET NAME
+                    number = number.replaceAll("[^\\d.]", "");
+                    phoneNumbers.add(number);
+                    TextView tv = new TextView(this);
+                    tv.setTextColor(Color.parseColor("#000000"));
+                    tv.setText(number);
+                    ((LinearLayout)findViewById(R.id.peopleLayout)).addView(tv);
+                    Log.i("CompleteTask", "added phonenumber" + number);
+                    break;
             }
             //if image is selected
             if (curimage != null) {
@@ -192,22 +224,18 @@ public class CreateTask extends AppCompatActivity {
                 imageList.add(curimage);
                 ((LinearLayout) findViewById(R.id.createTaskImageLayout)).addView(iv);
             }
-
         }
     }
     //end of image upload
 
     public void CreateTask(View view) {
-
         String title = "";
         String desc = "";
-        String assignedTo = "";
         String date = "";
         String startdate = month + "/" + day + "/" + year;
 
         title = ((TextView) findViewById(R.id.createTaskName)).getText().toString();
         desc = ((TextView) findViewById(R.id.createTaskDesc)).getText().toString();
-        assignedTo = ((Spinner) findViewById(R.id.createTaskTeam)).getSelectedItem().toString();
         date = ((TextView) findViewById(R.id.createTaskDate)).getText().toString();
 
         if (title.equals("")) {
@@ -223,22 +251,252 @@ public class CreateTask extends AppCompatActivity {
             return;
         }
 
-        //get current group
+        //get current group team members and fill spinner
         SharedPreferences prefs = getSharedPreferences("Data", MODE_PRIVATE);
-        int groupID = prefs.getInt("groupID", 1);
-
+        phoneNumbers.add(prefs.getString("phoneNumber", "0"));
 
         //CREATE EVENT IN DB
-        int res;
-        DatabaseHelper dbhelper = new DatabaseHelper(this);
-        res = dbhelper.InsertNewTask(groupID, title, desc, assignedTo, date, startdate, imageList);
+        new CreateTaskDB(this, phoneNumbers, imageList).execute(new String[]{title, desc, date, startdate}, null, null);
+    }
 
-        if (res != -1) {
-            Toast.makeText(this, "Saved Task", Toast.LENGTH_SHORT).show();
-            Intent i = new Intent(getApplicationContext(), MainActivity.class);
-            startActivity(i);
-        } else {
-            Toast.makeText(this, "Error saving to database", Toast.LENGTH_SHORT).show();
+    public void AddPeople(View v){
+        Intent pickContactIntent = new Intent(Intent.ACTION_PICK, Uri.parse("content://contacts"));
+        pickContactIntent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE); // Show user only contacts w/ phone numbers
+        startActivityForResult(pickContactIntent, 3);
+    }
+
+    public void Results(){
+        Log.i("OurDB", "CreateTaskDB created full event");
+        Toast.makeText(this, "Task Created!", Toast.LENGTH_SHORT).show();
+        Intent i = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(i);
+    }
+
+}
+
+class CreateTaskDB extends AsyncTask<String[], String, Integer> {
+
+    CreateTask context;
+    ProgressDialog progDailog;
+    ArrayList phoneNumbers;
+    ArrayList imageList;
+
+
+    CreateTaskDB(CreateTask context,ArrayList pNum, ArrayList il) {
+        this.context = context;
+        phoneNumbers = pNum;
+        imageList = il;
+    }
+
+    protected void onPreExecute(){
+        progDailog = ProgressDialog.show(context, "Connecting To Database",
+                "....please wait....", true);
+    }
+
+    protected Integer doInBackground(String[]... strings) {
+        /*
+        eventTitle,eventDescription, duedate, startdate
+         */
+        InputStream is = null;
+        String sqlCall = "INSERT INTO `EventTable`(`eventTitle`, `eventDescription`, " +
+                "`dueDate`, `startDate`) VALUES ('" +
+                strings[0][0] + "','" +
+                strings[0][1] + "','" +
+                strings[0][2] + "','" +
+                strings[0][3] +
+                "')";
+        try{
+            //POST the sql command you want
+            ArrayList<NameValuePair> nameValuePairs = new ArrayList<>();
+            nameValuePairs.add(new BasicNameValuePair("sqlCode",sqlCall));
+            HttpPost httppost = new HttpPost("http://androidiit.x10host.com/GenericInsert.php");
+            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpResponse response = httpclient.execute(httppost);
+            HttpEntity entity = response.getEntity();
+            is = entity.getContent();
+        }catch(Exception e){
+            Log.e("OurDB", "CreateTaskDB Error in http connection " + e.toString());
+            return 1;
         }
+        //convert response to string
+        try{
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is,"iso-8859-1"),8);
+            String line = reader.readLine();
+            Log.i("OurDB",  line);
+            if(line.equals("true")){
+                Log.i("OurDB", "CreateTaskDB created event");
+            }else {
+                Log.i("OurDB", "CreateTaskDB" + line);
+                is.close();
+                return 3;
+            }
+        }catch(Exception e){
+            Log.e("OurDB", "CreateTaskDB Error converting result " + e.toString());
+            return 2;
+        }
+
+        //GET EVENTID
+        String eventID = "0";
+        String result;
+        try{
+            //POST the sql command you want
+            ArrayList<NameValuePair> nameValuePairs = new ArrayList<>();
+            nameValuePairs.add(new BasicNameValuePair("sqlCode","SELECT MAX( eventID ) FROM EventTable"));
+            HttpPost httppost = new HttpPost("http://androidiit.x10host.com/Generic.php");
+            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpResponse response = httpclient.execute(httppost);
+            HttpEntity entity = response.getEntity();
+            is = entity.getContent();
+        }catch(Exception e){
+            Log.e("OurDB", "CreateTaskDB Error in http connection " + e.toString());
+            return 1;
+        }
+        //convert response to string
+        try{
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is,"iso-8859-1"),8);
+            StringBuilder sb = new StringBuilder();
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line + "\n");
+            }
+            is.close();
+            result=sb.toString();
+        }catch(Exception e){
+            Log.e("OurDB", "CreateTaskDB Error converting result " + e.toString());
+            return 2;
+        }
+        //parse json data
+        try{
+            //Log.e("OurDB", "Data from site "+result);
+            JSONArray jArray = new JSONArray(result);
+            //write to sqlite
+            for(int i=0;i<jArray.length();i++){
+                JSONObject json_data = jArray.getJSONObject(i);
+
+                eventID = json_data.getString("MAX( eventID )");
+                Log.i("OurDB", "CreateTaskDB Got eventID " + eventID);
+            }
+        }catch(Exception e){
+            Log.e("OurDB", "CreateTaskDB Error parsing data " + e.toString());
+            return 3;
+        }
+
+        for (int i = 0; i < phoneNumbers.size(); i++) {
+            sqlCall = "INSERT INTO `EventUserTable`(`eventID`, `phoneNumber`) VALUES ('" +
+                    eventID + "','" +
+                    phoneNumbers.get(i) +
+                    "')";
+            try{
+                //POST the sql command you want
+                ArrayList<NameValuePair> nameValuePairs = new ArrayList<>();
+                nameValuePairs.add(new BasicNameValuePair("sqlCode",sqlCall));
+                HttpPost httppost = new HttpPost("http://androidiit.x10host.com/GenericInsert.php");
+                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+                HttpClient httpclient = new DefaultHttpClient();
+                HttpResponse response = httpclient.execute(httppost);
+                HttpEntity entity = response.getEntity();
+                is = entity.getContent();
+            }catch(Exception e){
+                Log.e("OurDB", "CreateTaskDB Error in http connection " + e.toString());
+                return 1;
+            }
+            //convert response to string
+            try{
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is,"iso-8859-1"),8);
+                StringBuilder sb = new StringBuilder();
+                String line = null;
+                if(reader.readLine().equals("true")){
+                    Log.i("OurDB", "CreateTaskDB added a phonenumber");
+                }else {
+                    Log.i("OurDB", "CreateTaskDB failed to insert user probably exists already");
+                    is.close();
+                    return 3;
+                }
+            }catch(Exception e){
+                Log.e("OurDB", "CreateTaskDB Error converting result " + e.toString());
+                return 2;
+            }
+        }
+
+
+        //EVENT PICTURES
+        for (int i = 0; i < imageList.size(); i++) {
+            byte[] data = getBitmapAsByteArray((Bitmap) imageList.get(i));
+
+            sqlCall = "INSERT INTO `EventPictureTable`(`eventID`, `picture`) VALUES ('" +
+                    eventID + "','" +
+                    data +
+                    "')";
+            try{
+                //POST the sql command you want
+                ArrayList<NameValuePair> nameValuePairs = new ArrayList<>();
+                nameValuePairs.add(new BasicNameValuePair("sqlCode",sqlCall));
+                HttpPost httppost = new HttpPost("http://androidiit.x10host.com/GenericInsert.php");
+                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+                HttpClient httpclient = new DefaultHttpClient();
+                HttpResponse response = httpclient.execute(httppost);
+                HttpEntity entity = response.getEntity();
+                is = entity.getContent();
+            }catch(Exception e){
+                Log.e("OurDB", "CreateTaskDB Error in http connection " + e.toString());
+                return 1;
+            }
+            //convert response to string
+            try{
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is,"iso-8859-1"),8);
+                StringBuilder sb = new StringBuilder();
+                String line = null;
+                if(reader.readLine().equals("true")){
+                    Log.i("OurDB", "CreateTaskDB added a image");
+                }else {
+                    Log.i("OurDB", "CreateTaskDB failed to insert user probably exists already");
+                    is.close();
+                    return 3;
+                }
+            }catch(Exception e){
+                Log.e("OurDB", "CreateTaskDB Error converting result " + e.toString());
+                return 2;
+            }
+        }
+
+        try{
+            is.close();
+        }catch (Exception e){
+
+        }
+        //finally finished
+        return 0;
+    }
+
+    protected void onPostExecute(Integer integer)
+    {
+        try {
+            progDailog.dismiss();
+            switch (integer) {
+                case 0:
+                    context.Results();
+                    break;
+                case 1:
+                    Toast.makeText(context, "Failed To Access The Internet. Check Connection", Toast.LENGTH_SHORT).show();
+                    break;
+                case 2:
+                    Toast.makeText(context, "Error at external Database. try again", Toast.LENGTH_SHORT).show();
+                    break;
+                case 3:
+                    Toast.makeText(context, "User Already Exist", Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        }catch (Exception e){
+
+        }
+    }
+
+    //used to convert bitmaps to byteArray for storage
+    public static byte[] getBitmapAsByteArray(Bitmap bitmap) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
+        return outputStream.toByteArray();
     }
 }

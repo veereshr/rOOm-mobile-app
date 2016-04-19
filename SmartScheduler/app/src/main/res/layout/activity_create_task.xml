@@ -51,20 +51,27 @@
                android:id="@+id/createTaskDesc" />
 
 
-           <TextView
+           <Button
                android:textSize="@dimen/regular_font_size"
                android:textColor="@color/colorText"
                android:layout_width="wrap_content"
                android:layout_height="wrap_content"
-               android:text="Assigned To" />
+               android:text="Add People"
+               android:onClick="AddPeople"/>
 
-           <Spinner
-               android:textSize="@dimen/regular_font_size"
-               android:textColor="@color/colorText"
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"
-               android:id="@+id/createTaskTeam"
-               android:spinnerMode="dropdown" />
+           <ScrollView
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/peopleLayout">
+                </LinearLayout>
+
+           </ScrollView>
 
            <ScrollView
                android:orientation="horizontal"

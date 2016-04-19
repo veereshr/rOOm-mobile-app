@@ -81,9 +81,6 @@ public class CreateAccount extends AppCompatActivity {
             Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        DatabaseHelper dbhelper = new DatabaseHelper(getApplicationContext());
-
         new CreateAccountDB(this).execute(new String[] {pNum, pass, fName, lName, email}, null, null);
     }
 
@@ -137,9 +134,14 @@ class CreateAccountDB extends AsyncTask<String[], String, Integer> {
         //convert response to string
         try{
             BufferedReader reader = new BufferedReader(new InputStreamReader(is,"iso-8859-1"),8);
-            StringBuilder sb = new StringBuilder();
-            String line = null;
-            if(reader.readLine().equals("true")){
+            String line = reader.readLine();
+            Log.i("OurDB", line);
+            String foo;
+            while( (foo = reader.readLine()) != null){
+
+                Log.i("OurDB", foo);
+            }
+            if(line.equals("true")){
                 Log.i("OurDB", "CreateAccountDB created account");
                 is.close();
                 return 0;
