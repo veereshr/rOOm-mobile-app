@@ -29,12 +29,13 @@ import java.util.ArrayList;
  */
 class SyncDB extends AsyncTask<SQLiteDatabase, String, Integer> {
 
-    Context context;
+    MainActivity context;
     ProgressDialog progDailog;
 
-    SyncDB(Context context) {
+    SyncDB(MainActivity context) {
         this.context = context;
     }
+
     protected void onPreExecute(){
         progDailog = ProgressDialog.show(context, "Connecting To Database",
                 "....please wait....", true);
@@ -271,7 +272,7 @@ class SyncDB extends AsyncTask<SQLiteDatabase, String, Integer> {
             progDailog.dismiss();
             switch (integer) {
                 case 0:
-                    Toast.makeText(context, "Sync Complete", Toast.LENGTH_SHORT).show();
+                    context.onSyncComplete();
                     break;
                 case 1:
                     Toast.makeText(context, "Failed To Access The Internet. Check Connection", Toast.LENGTH_SHORT).show();

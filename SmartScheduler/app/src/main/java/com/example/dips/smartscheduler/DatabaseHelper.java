@@ -409,7 +409,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             String[] taskDetails;
 
             int i = 0;
-            if(position!=0){
+            if (position != 0) {
                 while (cursor.moveToNext()) {  // get the data into array, or class variable
                     i++;
                     if (position == i) {
@@ -439,11 +439,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             return null;
         }
         return null;
-    }
-
-    public void SyncDB(){
-        SQLiteDatabase db = this.getReadableDatabase();
-        new SyncDB(context).execute(db, null, null);
     }
 }
 

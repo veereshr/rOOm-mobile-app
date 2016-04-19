@@ -1,6 +1,8 @@
 package com.example.dips.smartscheduler;
 
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -16,11 +18,12 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ViewTask extends Fragment {
+public class ViewTask extends Fragment{
 
     public static FragmentActivity TaskFragActivity;
 
@@ -62,9 +65,7 @@ public class ViewTask extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> a, View v, int position, long id) {
 
-                //TODO FILL THIS IN WITH REAL task DATA
                 SharedPreferences.Editor editor = TaskFragActivity.getSharedPreferences("Data", 0x0000).edit();
-                //TODO NOTICE THAT WE START COUNTING FROM 1 NOT 0
                 editor.putInt("eventID", 1);
                 editor.putInt("position", position);
                 editor.commit();
@@ -73,27 +74,7 @@ public class ViewTask extends Fragment {
             }
         });
         tasksAdapter.notifyDataSetChanged();
-        Button BackToGroupList= (Button) TaskTabRelLayout.findViewById(R.id.btnAllTaskBack);
-
-        BackToGroupList.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(TaskFragActivity.getApplicationContext(), GroupList.class);
-                startActivity(intent);
-            }
-        });
-
-        Button AddTaskButton= (Button) TaskTabRelLayout.findViewById(R.id.btnAllTaskAdd);
-
-        AddTaskButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(),CreateTask.class);
-                startActivity(intent);
-            }
-        });
         return TaskTabRelLayout;
     }
-
 }
 

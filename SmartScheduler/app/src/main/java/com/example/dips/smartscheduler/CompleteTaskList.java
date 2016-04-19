@@ -63,9 +63,7 @@ public class CompleteTaskList extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> a, View v, int position, long id) {
 
-                //TODO FILL THIS IN WITH REAL task DATA
                 SharedPreferences.Editor editor = CmpltTaskFragActivity.getSharedPreferences("Data", 0x0000).edit();
-                //TODO NOTICE THAT WE START COUNTING FROM 1 NOT 0
                 editor.putInt("eventID", 1);
                 editor.putInt("position", position);
                 editor.commit();

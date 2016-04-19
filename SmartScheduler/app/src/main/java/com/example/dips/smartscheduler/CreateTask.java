@@ -58,7 +58,8 @@ public class CreateTask extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("Data", MODE_PRIVATE);
         int groupID = prefs.getInt("groupID", 1);
 
-
+        //TODO CONTACTS
+        /*
         DatabaseHelper dbhelper = new DatabaseHelper(getApplicationContext());
         List<String> listGroupItems = dbhelper.GetGroupMembersName(groupID);
         Spinner dropdown = (Spinner) findViewById(R.id.createTaskTeam);
@@ -66,6 +67,7 @@ public class CreateTask extends AppCompatActivity {
         ArrayAdapter<String> adapterGroupName = new ArrayAdapter<>(
                 this, android.R.layout.simple_spinner_dropdown_item, listGroupItems);
         dropdown.setAdapter(adapterGroupName);
+        */
     }
 
     //used for Select Date
