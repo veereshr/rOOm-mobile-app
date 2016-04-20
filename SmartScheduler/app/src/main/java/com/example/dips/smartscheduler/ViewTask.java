@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -59,7 +60,14 @@ public class ViewTask extends Fragment{
             Log.d("Event Names:", eventList.get(i));
         }
 
-        ArrayAdapter tasksAdapter= new ArrayAdapter<String>(TaskFragActivity.getApplicationContext(), android.R.layout.simple_expandable_list_item_1,eventList) ;
+        ArrayAdapter tasksAdapter= new ArrayAdapter<String>(TaskFragActivity.getApplicationContext(), android.R.layout.simple_expandable_list_item_1,android.R.id.text1,eventList){
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                TextView textView = (TextView) super.getView(position, convertView, parent);
+                textView.setTextColor(Color.BLACK);
+                return textView;
+            }
+        } ;
         viewListTask.setAdapter(tasksAdapter);
         viewListTask.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

@@ -1,5 +1,6 @@
 package com.example.dips.smartscheduler;
 
+import android.graphics.Color;
 import android.support.v4.app.Fragment;
 //import android.support.v4.app.FragmentActivity;
 import android.content.Intent;
@@ -35,14 +36,13 @@ public class CompleteTaskList extends Fragment {
         //create DatabaseHelper
         DatabaseHelper dbHelper = new DatabaseHelper(this.getContext());
 
-        String[] eventNames = dbHelper.getCmpltTaskList(phoneNumber);
+        final List<String[]> eventDetails = dbHelper.getCmpltTaskList(phoneNumber);
 
-        Log.d("event Names Size :", String.valueOf(eventNames.length));
+        Log.d("event Names Size :", String.valueOf(eventDetails.size()));
 
         //set NOTASKDATA text view visibilty property
         TextView txtNoCmpltTask = (TextView) CmpltTaskListTabRelLayout.findViewById(R.id.txtViewCmpltTaskData);
-        if (eventNames.length == 0) {
-            Log.d("Event Size:", String.valueOf(eventNames.length));
+        if (eventDetails.size()/2 == 0) {
             txtNoCmpltTask.setVisibility(View.VISIBLE);
         }
 
@@ -51,20 +51,28 @@ public class CompleteTaskList extends Fragment {
         List<String> eventList = new ArrayList<>();
 
 
-        //add eventNames to the list
-        for (int i = 0; i < eventNames.length; i++) {
-            eventList.add(eventNames[i]);
+        //add eventDetails to the list
+        for (int i = 0; i < eventDetails.size()/2; i++) {
+            eventList.add(eventDetails.get(1)[i]);
             Log.d("Event Names:", eventList.get(i));
         }
 
-        ArrayAdapter tasksAdapter = new ArrayAdapter<String>(CmpltTaskFragActivity.getApplicationContext(), android.R.layout.simple_expandable_list_item_1, eventList);
+        ArrayAdapter tasksAdapter = new ArrayAdapter<String>(CmpltTaskFragActivity.getApplicationContext(), android.R.layout.simple_expandable_list_item_1,android.R.id.text1, eventList){
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                TextView textView = (TextView) super.getView(position, convertView, parent);
+                textView.setTextColor(Color.BLACK);
+                return textView;
+            }
+        };
+
         viewListTask.setAdapter(tasksAdapter);
         viewListTask.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> a, View v, int position, long id) {
 
                 SharedPreferences.Editor editor = CmpltTaskFragActivity.getSharedPreferences("Data", 0x0000).edit();
-                editor.putInt("eventID", 1);
+                editor.putInt("eventID", Integer.parseInt(eventDetails.get(0)[position]));
                 editor.putInt("position", position);
                 editor.commit();
                 Intent intent = new Intent(CmpltTaskFragActivity.getApplicationContext(), ViewSingleTask.class);

@@ -9,12 +9,6 @@
     android:background="@color/backGroundColor"
     tools:context="com.example.dips.smartscheduler.CompleteTaskList">
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center_horizontal"
-        android:weightSum="1">
 
         <TextView
             android:layout_width="wrap_content"
@@ -25,17 +19,16 @@
             android:layout_gravity="center_horizontal"
             android:textSize="@dimen/regular_font_size"
             android:visibility="invisible"
-            android:background="#e98787" />
+            android:background="#e98787"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
 
         <ListView
             android:layout_width="wrap_content"
             android:layout_height="310dp"
             android:id="@+id/listViewCmpltTaskList"
-            android:layout_below="@+id/txtViewTask"
             android:layout_centerHorizontal="true"
-            android:layout_weight="0.41" />
-
-
-    </LinearLayout>
+            android:layout_weight="0.41"
+            android:layout_below="@+id/txtViewCmpltTaskData" />
 
 </RelativeLayout>

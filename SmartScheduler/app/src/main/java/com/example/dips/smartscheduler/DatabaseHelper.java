@@ -31,6 +31,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Jorge on 3/31/2016.
@@ -328,7 +329,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     //used in CompleteTaskList.java to display list of all Completed tasks
-    public String[] getCmpltTaskList(String phnNumber){
+    public List<String[]> getCmpltTaskList(String phnNumber){
         try
         {
             SQLiteDatabase db = this.getWritableDatabase();
@@ -336,7 +337,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             //get the cursor
             //SQL Statement to get GroupNames Details.
             String SQLQuery=
-                    "SELECT eventTitle from EventTable where eventID IN " +
+                    "SELECT eventTitle,eventID from EventTable where eventID IN " +
                             "(SELECT eventID FROM EventUserTable NATURAL JOIN EventTable " +
                             "WHERE phoneNumber=" ;
             Cursor cursor = db.rawQuery(SQLQuery+String.valueOf(phnNumber)+" and completedDate IS NOT NULL)", null);
@@ -344,18 +345,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             //count the number of rows
             int rowNum=cursor.getCount();
 
+            List<String[]> eventDetails=new ArrayList<>();
+
             String[] eventNames = new String[rowNum];
+
+            String[] eventIds = new String[rowNum];
 
             int i=0;
             while (cursor.moveToNext()){  // get the data into array, or class variable
                 eventNames[i]=cursor.getString(0);
+                eventIds[i]=cursor.getString(1);
+                eventDetails.add(new String[]{eventIds[i], eventNames[i]});
                 i++;
             }
 
             cursor.close();
             db.close();
             Log.i(LOGTAG, "Successfully Fetched CompletedEventNames");
-            return eventNames;
+            return eventDetails;
         }catch(Exception e){
             Log.i(LOGTAG, "Failed to Fetch CompletedEventNames " + e.toString());
             return null;
