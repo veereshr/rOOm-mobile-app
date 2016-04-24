@@ -42,7 +42,7 @@ public class CompleteTaskList extends Fragment {
 
         //set NOTASKDATA text view visibilty property
         TextView txtNoCmpltTask = (TextView) CmpltTaskListTabRelLayout.findViewById(R.id.txtViewCmpltTaskData);
-        if (eventDetails.size()/2 == 0) {
+        if (eventDetails.size() == 0) {
             txtNoCmpltTask.setVisibility(View.VISIBLE);
         }
 
@@ -52,8 +52,8 @@ public class CompleteTaskList extends Fragment {
 
 
         //add eventDetails to the list
-        for (int i = 0; i < eventDetails.size()/2; i++) {
-            eventList.add(eventDetails.get(1)[i]);
+        for (int i = 0; i < eventDetails.size(); i++) {
+            eventList.add(eventDetails.get(i)[1]);
             Log.d("Event Names:", eventList.get(i));
         }
 

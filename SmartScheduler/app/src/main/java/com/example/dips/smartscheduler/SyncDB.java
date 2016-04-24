@@ -144,9 +144,12 @@ class SyncDB extends AsyncTask<SQLiteDatabase, String, Integer> {
                 values.put("eventID", json_data.getString("eventID"));
                 values.put("eventTitle", json_data.getString("eventTitle"));
                 values.put("eventDescription", json_data.getString("eventDescription"));
+                values.put("dueDate", json_data.getString("dueDate"));
                 values.put("startDate", json_data.getString("startDate"));
                 values.put("comment", json_data.getString("comment"));
-                values.put("completedDate", json_data.getString("completedDate"));
+                if(!json_data.getString( "completedDate").equals("")){
+                    values.put("completedDate", json_data.getString("completedDate"));
+                }
                 values.put("completedBy", json_data.getString("completedBy"));
                 // Inserting Row
                 db[0].insert("EventTable", null, values);

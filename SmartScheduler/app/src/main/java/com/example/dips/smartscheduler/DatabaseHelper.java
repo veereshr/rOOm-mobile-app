@@ -65,7 +65,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "eventDescription TEXT," +
                     "dueDate TEXT," +
                     "startDate TEXT," +
-                    "assignTo TEXT," +
                     "comment TEXT," +
                     "completedDate TEXT," +
                     "completedBy TEXT);";
