@@ -4,9 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/backGroundColor"
-    android:paddingLeft="@dimen/activity_regular_padding"
-    android:paddingRight="@dimen/activity_regular_padding"
-    android:paddingTop="@dimen/activity_regular_padding"
     tools:context="com.example.dips.smartscheduler.ViewTask">
 
     <LinearLayout

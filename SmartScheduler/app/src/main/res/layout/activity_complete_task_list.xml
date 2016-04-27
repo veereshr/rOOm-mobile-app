@@ -3,9 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="@dimen/activity_regular_padding"
-    android:paddingRight="@dimen/activity_regular_padding"
-    android:paddingLeft="@dimen/activity_regular_padding"
     android:background="@color/backGroundColor"
     tools:context="com.example.dips.smartscheduler.CompleteTaskList">
 

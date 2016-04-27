@@ -1,5 +1,6 @@
 package com.example.dips.smartscheduler;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -49,6 +50,7 @@ public class AlertReceiver extends Service {
 
     private void createNotification(String taskName) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getBaseContext());
+
         builder.setSmallIcon(R.drawable.iconnotification);
         builder.setContentTitle("You have a new Task!");
         builder.setContentText(taskName);
@@ -59,6 +61,8 @@ public class AlertReceiver extends Service {
         PendingIntent notificIntent = PendingIntent.getActivity(getApplicationContext(), 0,
                 new Intent(getApplicationContext(), MainActivity.class), 0);
         builder.setContentIntent(notificIntent);
+
+        builder.mNotification.flags|= Notification.FLAG_ONLY_ALERT_ONCE;    // Dont vibrate or make notification sound
 
         NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         nm.notify(0, builder.build());
