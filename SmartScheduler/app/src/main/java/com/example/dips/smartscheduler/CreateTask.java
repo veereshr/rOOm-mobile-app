@@ -65,6 +65,7 @@ public class CreateTask extends AppCompatActivity {
     private Bitmap curimage;
     private ArrayList imageList = new ArrayList();
     private ArrayList phoneNumbers = new ArrayList(); // people that are added
+    private ArrayList people = new ArrayList(); // people that are added UI Only
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -195,7 +196,8 @@ public class CreateTask extends AppCompatActivity {
                     break;
                 case 3://contacts
                     Uri contactUri = data.getData();
-                    String[] projection = {ContactsContract.CommonDataKinds.Phone.NUMBER};
+                    String[] projection = {ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                            ContactsContract.CommonDataKinds.Phone.NUMBER};
                     Cursor cursor = getContentResolver()
                             .query(contactUri, projection, null, null, null);
                     cursor.moveToFirst();
@@ -203,15 +205,28 @@ public class CreateTask extends AppCompatActivity {
                     // Retrieve the phone number from the NUMBER column
                     int column = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
                     String number = cursor.getString(column);
-                    //column = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
-                    //String name = cursor.getString(column);
-                    //TODO GET NAME
+                    int indexName = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
+                    String name = cursor.getString(indexName);
                     number = number.replaceAll("[^\\d.]", "");
-                    phoneNumbers.add(number);
-                    TextView tv = new TextView(this);
-                    tv.setTextColor(Color.parseColor("#000000"));
-                    tv.setText(number);
-                    ((LinearLayout)findViewById(R.id.peopleLayout)).addView(tv);
+                    if(phoneNumbers.contains(number)){
+                        Toast.makeText(CreateTask.this, "Phone Number Already Added", Toast.LENGTH_SHORT).show();
+                        Log.i("CompleteTask", "phonenumber already added" + number);
+                        break;
+                    }
+                    phoneNumbers.add(name + " " + number);
+                    people.add(number);
+                    //set phonenumber UI
+
+                    Spinner s = (Spinner) findViewById(R.id.spinnerCreateTask);
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                            android.R.layout.simple_spinner_item, phoneNumbers);
+                    s.setAdapter(adapter);
+
+
+                   //TextView tv = new TextView(this);
+                   //tv.setTextColor(Color.parseColor("#000000"));
+                   //tv.setText(number);
+                   //((LinearLayout)findViewById(R.id.peopleLayout)).addView(tv);
                     Log.i("CompleteTask", "added phonenumber" + number);
                     break;
             }

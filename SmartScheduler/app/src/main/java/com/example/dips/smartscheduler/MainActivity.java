@@ -1,7 +1,11 @@
 package com.example.dips.smartscheduler;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -10,6 +14,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 import android.provider.ContactsContract;
+
+import java.util.GregorianCalendar;
 
 public class MainActivity extends FragmentActivity {
 
@@ -63,21 +69,29 @@ public class MainActivity extends FragmentActivity {
             public void onTabReselected(TabLayout.Tab tab) {
             }
         });
+
+        //set alert to trigger daily
+        Intent i = new Intent(this, AlertReceiver.class);
+        PendingIntent pi = PendingIntent.getService(this, 0, i, 0);
+        AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+        am.cancel(pi); // cancel any existing alarms
+        am.setInexactRepeating(AlarmManager.RTC_WAKEUP,
+                System.currentTimeMillis(), 1000 * 60 * 1, pi);
     }
 
-    private void syncDB(){
-        try
-        {
+    private void syncDB() {
+        try {
             DatabaseHelper dbHelper = new DatabaseHelper(this);
             new SyncDB(this).execute(dbHelper.getReadableDatabase(), null, null);
-        }catch (Exception e){
-            Log.e("SyncDB","error at SyncDB " + e.toString());
+        } catch (Exception e) {
+            Log.e("SyncDB", "error at SyncDB " + e.toString());
         }
 
     }
 
-    public void onSyncComplete(){
+    public void onSyncComplete() {
         Toast.makeText(this, "Sync Complete", Toast.LENGTH_SHORT).show();
+        //restart current screen
         finish();
         startActivity(getIntent());
     }

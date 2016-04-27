@@ -50,16 +50,28 @@
                android:layout_height="wrap_content"
                android:id="@+id/createTaskDesc" />
 
+           <LinearLayout
+               android:orientation="horizontal"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content">
 
-           <Button
-               android:textSize="@dimen/regular_font_size"
-               android:textColor="@color/colorText"
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:text="Add People"
-               android:onClick="AddPeople"/>
+               <Button
+                   android:textSize="@dimen/regular_font_size"
+                   android:textColor="@color/colorText"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="Add People"
+                   android:onClick="AddPeople"/>
 
-           <ScrollView
+
+               <Spinner
+                   android:layout_width="match_parent"
+                   android:layout_height="match_parent"
+                   android:id="@+id/spinnerCreateTask"
+                   android:layout_gravity="center_horizontal" />
+           </LinearLayout>
+
+            <ScrollView
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">

@@ -31,6 +31,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -339,7 +340,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "SELECT eventTitle,eventID from EventTable where eventID IN " +
                             "(SELECT eventID FROM EventUserTable NATURAL JOIN EventTable " +
                             "WHERE phoneNumber=" ;
-            Cursor cursor = db.rawQuery(SQLQuery+String.valueOf(phnNumber)+" and completedDate IS NOT NULL)", null);
+            Cursor cursor = db.rawQuery(SQLQuery + String.valueOf(phnNumber) + " and completedDate IS NOT NULL)", null);
 
             //count the number of rows
             int rowNum=cursor.getCount();
@@ -445,6 +446,40 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             return null;
         }
         return null;
+    }
+
+    public String getPendingJobs(String phoneNumber) {
+        try
+        {
+            String eventName = null;
+            SQLiteDatabase db = this.getWritableDatabase();
+
+            //get the cursor
+            //SQL Statement to get GroupNames Details.
+            String SQLQuery=
+                    "SELECT eventTitle,dueDate from EventTable where eventID IN " +
+                            "(SELECT eventID FROM EventUserTable NATURAL JOIN EventTable " +
+                            "WHERE phoneNumber=" ;
+            Cursor cursor = db.rawQuery(SQLQuery + String.valueOf(phoneNumber) + " and completedDate IS NULL)", null);
+
+            //count the number of rows
+            Calendar calendar = Calendar.getInstance();
+            String today = calendar.get(Calendar.MONTH) + "/" +
+                    calendar.get(Calendar.DAY_OF_MONTH) + "/" + calendar.get(Calendar.YEAR);
+
+            while (cursor.moveToNext()){  // get the data into array, or class variable
+                if(cursor.getString(1).equals(today))
+                    eventName = cursor.getString(0);
+            }
+
+            cursor.close();
+            db.close();
+            Log.i(LOGTAG, "Successfully Fetched pending Jobs");
+            return eventName;
+        }catch(Exception e){
+            Log.i(LOGTAG, "Failed to Fetch pending Jobs " + e.toString());
+            return null;
+        }
     }
 }
 
