@@ -39,6 +39,14 @@ public class MainActivity extends FragmentActivity {
                 startActivity(intent);
             }
         });
+        findViewById(R.id.btnLogout).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), LogIn.class);
+                startActivity(intent);
+            }
+        });
+
 
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

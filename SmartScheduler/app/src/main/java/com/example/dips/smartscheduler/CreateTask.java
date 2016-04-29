@@ -21,6 +21,7 @@ import android.provider.Contacts;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -75,7 +76,7 @@ public class CreateTask extends AppCompatActivity {
         //get todays date and put in select date text
         calendar = Calendar.getInstance();
         year = calendar.get(Calendar.YEAR);
-        month = calendar.get(Calendar.MONTH);
+        month = (calendar.get(Calendar.MONTH) + 1);
         day = calendar.get(Calendar.DAY_OF_MONTH);
         showDate(year, month, day);
     }
@@ -144,7 +145,7 @@ public class CreateTask extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
-            switch(requestCode){
+            switch (requestCode) {
                 case 1:
                     curimage = null;
                     File f = new File(Environment.getExternalStorageDirectory().toString());
@@ -208,25 +209,26 @@ public class CreateTask extends AppCompatActivity {
                     int indexName = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
                     String name = cursor.getString(indexName);
                     number = number.replaceAll("[^\\d.]", "");
-                    if(phoneNumbers.contains(number)){
+                    if (phoneNumbers.contains(number)) {
                         Toast.makeText(CreateTask.this, "Phone Number Already Added", Toast.LENGTH_SHORT).show();
                         Log.i("CompleteTask", "phonenumber already added" + number);
                         break;
                     }
-                    phoneNumbers.add(name + " " + number);
-                    people.add(number);
+
+                    people.add(name + " " + number);
+                    phoneNumbers.add(number);
                     //set phonenumber UI
 
                     Spinner s = (Spinner) findViewById(R.id.spinnerCreateTask);
                     ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                            android.R.layout.simple_spinner_item, phoneNumbers);
+                            android.R.layout.simple_spinner_item, people);
                     s.setAdapter(adapter);
 
 
-                   //TextView tv = new TextView(this);
-                   //tv.setTextColor(Color.parseColor("#000000"));
-                   //tv.setText(number);
-                   //((LinearLayout)findViewById(R.id.peopleLayout)).addView(tv);
+                    //TextView tv = new TextView(this);
+                    //tv.setTextColor(Color.parseColor("#000000"));
+                    //tv.setText(number);
+                    //((LinearLayout)findViewById(R.id.peopleLayout)).addView(tv);
                     Log.i("CompleteTask", "added phonenumber" + number);
                     break;
             }
@@ -270,23 +272,42 @@ public class CreateTask extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("Data", MODE_PRIVATE);
         phoneNumbers.add(prefs.getString("phoneNumber", "0"));
 
+        sendSMS(title, prefs.getString("phoneNumber", "0"));
+
         //CREATE EVENT IN DB
         new CreateTaskDB(this, phoneNumbers, imageList).execute(new String[]{title, desc, date, startdate}, null, null);
     }
 
-    public void AddPeople(View v){
+    public void AddPeople(View v) {
         Intent pickContactIntent = new Intent(Intent.ACTION_PICK, Uri.parse("content://contacts"));
         pickContactIntent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE); // Show user only contacts w/ phone numbers
         startActivityForResult(pickContactIntent, 3);
     }
 
-    public void Results(){
+    public void Results() {
         Log.i("OurDB", "CreateTaskDB created full event");
         Toast.makeText(this, "Task Created!", Toast.LENGTH_SHORT).show();
         Intent i = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(i);
     }
 
+    private void sendSMS(String title, String phoneNumber) {
+        Log.i("Send SMS", "");
+        String phoneNo = phoneNumber;
+        String taskName = title;
+
+        try {
+            SmsManager smsManager = SmsManager.getDefault();
+            for (int i = 0; i < phoneNumbers.size(); i++) {
+                smsManager.sendTextMessage(String.valueOf(phoneNumbers.get(i)), null, "Hi, " + phoneNumbers.get(i) + ".you are added in the "
+                        + taskName + "task by " + phoneNo, null, null);
+            }
+            Toast.makeText(getApplicationContext(), "SMS sent.", Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            Toast.makeText(getApplicationContext(), "SMS faild, please try again.", Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
+    }
 }
 
 class CreateTaskDB extends AsyncTask<String[], String, Integer> {
@@ -297,13 +318,13 @@ class CreateTaskDB extends AsyncTask<String[], String, Integer> {
     ArrayList imageList;
 
 
-    CreateTaskDB(CreateTask context,ArrayList pNum, ArrayList il) {
+    CreateTaskDB(CreateTask context, ArrayList pNum, ArrayList il) {
         this.context = context;
         phoneNumbers = pNum;
         imageList = il;
     }
 
-    protected void onPreExecute(){
+    protected void onPreExecute() {
         progDailog = ProgressDialog.show(context, "Connecting To Database",
                 "....please wait....", true);
     }
@@ -320,33 +341,33 @@ class CreateTaskDB extends AsyncTask<String[], String, Integer> {
                 strings[0][2] + "','" +
                 strings[0][3] +
                 "')";
-        try{
+        try {
             //POST the sql command you want
             ArrayList<NameValuePair> nameValuePairs = new ArrayList<>();
-            nameValuePairs.add(new BasicNameValuePair("sqlCode",sqlCall));
+            nameValuePairs.add(new BasicNameValuePair("sqlCode", sqlCall));
             HttpPost httppost = new HttpPost("http://androidiit.x10host.com/GenericInsert.php");
             httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
             HttpClient httpclient = new DefaultHttpClient();
             HttpResponse response = httpclient.execute(httppost);
             HttpEntity entity = response.getEntity();
             is = entity.getContent();
-        }catch(Exception e){
+        } catch (Exception e) {
             Log.e("OurDB", "CreateTaskDB Error in http connection " + e.toString());
             return 1;
         }
         //convert response to string
-        try{
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is,"iso-8859-1"),8);
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
             String line = reader.readLine();
-            Log.i("OurDB",  line);
-            if(line.equals("true")){
+            Log.i("OurDB", line);
+            if (line.equals("true")) {
                 Log.i("OurDB", "CreateTaskDB created event");
-            }else {
+            } else {
                 Log.i("OurDB", "CreateTaskDB" + line);
                 is.close();
                 return 3;
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             Log.e("OurDB", "CreateTaskDB Error converting result " + e.toString());
             return 2;
         }
@@ -354,46 +375,46 @@ class CreateTaskDB extends AsyncTask<String[], String, Integer> {
         //GET EVENTID
         String eventID = "0";
         String result;
-        try{
+        try {
             //POST the sql command you want
             ArrayList<NameValuePair> nameValuePairs = new ArrayList<>();
-            nameValuePairs.add(new BasicNameValuePair("sqlCode","SELECT MAX( eventID ) FROM EventTable"));
+            nameValuePairs.add(new BasicNameValuePair("sqlCode", "SELECT MAX( eventID ) FROM EventTable"));
             HttpPost httppost = new HttpPost("http://androidiit.x10host.com/Generic.php");
             httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
             HttpClient httpclient = new DefaultHttpClient();
             HttpResponse response = httpclient.execute(httppost);
             HttpEntity entity = response.getEntity();
             is = entity.getContent();
-        }catch(Exception e){
+        } catch (Exception e) {
             Log.e("OurDB", "CreateTaskDB Error in http connection " + e.toString());
             return 1;
         }
         //convert response to string
-        try{
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is,"iso-8859-1"),8);
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
             StringBuilder sb = new StringBuilder();
             String line = null;
             while ((line = reader.readLine()) != null) {
                 sb.append(line + "\n");
             }
             is.close();
-            result=sb.toString();
-        }catch(Exception e){
+            result = sb.toString();
+        } catch (Exception e) {
             Log.e("OurDB", "CreateTaskDB Error converting result " + e.toString());
             return 2;
         }
         //parse json data
-        try{
+        try {
             //Log.e("OurDB", "Data from site "+result);
             JSONArray jArray = new JSONArray(result);
             //write to sqlite
-            for(int i=0;i<jArray.length();i++){
+            for (int i = 0; i < jArray.length(); i++) {
                 JSONObject json_data = jArray.getJSONObject(i);
 
                 eventID = json_data.getString("MAX( eventID )");
                 Log.i("OurDB", "CreateTaskDB Got eventID " + eventID);
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             Log.e("OurDB", "CreateTaskDB Error parsing data " + e.toString());
             return 3;
         }
@@ -403,33 +424,33 @@ class CreateTaskDB extends AsyncTask<String[], String, Integer> {
                     eventID + "','" +
                     phoneNumbers.get(i) +
                     "')";
-            try{
+            try {
                 //POST the sql command you want
                 ArrayList<NameValuePair> nameValuePairs = new ArrayList<>();
-                nameValuePairs.add(new BasicNameValuePair("sqlCode",sqlCall));
+                nameValuePairs.add(new BasicNameValuePair("sqlCode", sqlCall));
                 HttpPost httppost = new HttpPost("http://androidiit.x10host.com/GenericInsert.php");
                 httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
                 HttpClient httpclient = new DefaultHttpClient();
                 HttpResponse response = httpclient.execute(httppost);
                 HttpEntity entity = response.getEntity();
                 is = entity.getContent();
-            }catch(Exception e){
+            } catch (Exception e) {
                 Log.e("OurDB", "CreateTaskDB Error in http connection " + e.toString());
                 return 1;
             }
             //convert response to string
-            try{
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is,"iso-8859-1"),8);
+            try {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
                 StringBuilder sb = new StringBuilder();
                 String line = null;
-                if(reader.readLine().equals("true")){
+                if (reader.readLine().equals("true")) {
                     Log.i("OurDB", "CreateTaskDB added a phonenumber");
-                }else {
+                } else {
                     Log.i("OurDB", "CreateTaskDB failed to insert user probably exists already");
                     is.close();
                     return 3;
                 }
-            }catch(Exception e){
+            } catch (Exception e) {
                 Log.e("OurDB", "CreateTaskDB Error converting result " + e.toString());
                 return 2;
             }
@@ -444,49 +465,48 @@ class CreateTaskDB extends AsyncTask<String[], String, Integer> {
                     eventID + "','" +
                     data +
                     "')";
-            try{
+            try {
                 //POST the sql command you want
                 ArrayList<NameValuePair> nameValuePairs = new ArrayList<>();
-                nameValuePairs.add(new BasicNameValuePair("sqlCode",sqlCall));
+                nameValuePairs.add(new BasicNameValuePair("sqlCode", sqlCall));
                 HttpPost httppost = new HttpPost("http://androidiit.x10host.com/GenericInsert.php");
                 httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
                 HttpClient httpclient = new DefaultHttpClient();
                 HttpResponse response = httpclient.execute(httppost);
                 HttpEntity entity = response.getEntity();
                 is = entity.getContent();
-            }catch(Exception e){
+            } catch (Exception e) {
                 Log.e("OurDB", "CreateTaskDB Error in http connection " + e.toString());
                 return 1;
             }
             //convert response to string
-            try{
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is,"iso-8859-1"),8);
+            try {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
                 StringBuilder sb = new StringBuilder();
                 String line = null;
-                if(reader.readLine().equals("true")){
+                if (reader.readLine().equals("true")) {
                     Log.i("OurDB", "CreateTaskDB added a image");
-                }else {
+                } else {
                     Log.i("OurDB", "CreateTaskDB failed to insert user probably exists already");
                     is.close();
                     return 3;
                 }
-            }catch(Exception e){
+            } catch (Exception e) {
                 Log.e("OurDB", "CreateTaskDB Error converting result " + e.toString());
                 return 2;
             }
         }
 
-        try{
+        try {
             is.close();
-        }catch (Exception e){
+        } catch (Exception e) {
 
         }
         //finally finished
         return 0;
     }
 
-    protected void onPostExecute(Integer integer)
-    {
+    protected void onPostExecute(Integer integer) {
         try {
             progDailog.dismiss();
             switch (integer) {
@@ -503,7 +523,7 @@ class CreateTaskDB extends AsyncTask<String[], String, Integer> {
                     Toast.makeText(context, "User Already Exist", Toast.LENGTH_SHORT).show();
                     break;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
 
         }
     }

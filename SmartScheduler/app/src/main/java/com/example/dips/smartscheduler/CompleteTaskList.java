@@ -57,7 +57,7 @@ public class CompleteTaskList extends Fragment {
             Log.d("Event Names:", eventList.get(i));
         }
 
-        ArrayAdapter tasksAdapter = new ArrayAdapter<String>(CmpltTaskFragActivity.getApplicationContext(), android.R.layout.simple_expandable_list_item_1,android.R.id.text1, eventList){
+        ArrayAdapter tasksAdapter = new ArrayAdapter<String>(CmpltTaskFragActivity.getApplicationContext(), android.R.layout.simple_expandable_list_item_1, android.R.id.text1, eventList) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 TextView textView = (TextView) super.getView(position, convertView, parent);
@@ -72,7 +72,7 @@ public class CompleteTaskList extends Fragment {
             public void onItemClick(AdapterView<?> a, View v, int position, long id) {
 
                 SharedPreferences.Editor editor = CmpltTaskFragActivity.getSharedPreferences("Data", 0x0000).edit();
-                editor.putInt("eventID", Integer.parseInt(eventDetails.get(0)[position]));
+                editor.putInt("eventID", Integer.parseInt(eventDetails.get(position)[0]));
                 editor.putInt("position", position);
                 editor.commit();
                 Intent intent = new Intent(CmpltTaskFragActivity.getApplicationContext(), ViewSingleTask.class);

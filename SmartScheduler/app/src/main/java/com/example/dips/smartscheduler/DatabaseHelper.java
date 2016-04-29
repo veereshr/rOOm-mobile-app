@@ -165,7 +165,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return null;
     }
 
-    //used in completeTask to return task data
+    //used in completeTask and view Single Task to return task data
     public String[] GetTaskInfo(int taskID) {
         try {
             String[] sa = new String[5];
@@ -174,16 +174,44 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Cursor cursor = db.rawQuery("SELECT * FROM EventTable where eventID = " + taskID, null);
 
             cursor.moveToFirst();
-            sa[0] = cursor.getString(1);
-            sa[1] = cursor.getString(2);
-            sa[2] = cursor.getString(3);
-            sa[3] = cursor.getString(4);
-            sa[4] = cursor.getString(5);
+            sa[0] = cursor.getString(1); // event Title
+            sa[1] = cursor.getString(2); // event Desc
+            sa[2] = cursor.getString(3); // due date
+            sa[3] = cursor.getString(4); // start Date
+            sa[4] = cursor.getString(5); // comment
             cursor.close();
             Log.i(LOGTAG, "Successfully Got Task Info");
             return sa;
         } catch (Exception e) {
             Log.i(LOGTAG, "Failed to get TaskInfo " + e.toString());
+            return null;
+        }
+    }
+
+    //used in view Single Task
+    public ArrayList GetPeople(int taskID) {
+        try {
+            ArrayList phoneNumbers = new ArrayList();
+
+            SQLiteDatabase db = this.getWritableDatabase();
+            Cursor cursor = db.rawQuery("SELECT phoneNumber FROM EventUserTable where eventID = " + taskID, null);
+
+            while (cursor.moveToNext()) {
+                String phoneNumber = cursor.getString(0);
+                Cursor cursor1 = db.rawQuery("SELECT firstName, lastName FROM`UserTable`where " +
+                        "phoneNumber = " + phoneNumber, null);
+                if (cursor1.moveToFirst()) { // they have account
+                    phoneNumbers.add(cursor1.getString(0) + " " + cursor1.getString(1) + " " + phoneNumber);
+                } else { // is just phoneNumber
+                    phoneNumbers.add(phoneNumber);
+                }
+            }
+
+            cursor.close();
+            Log.i(LOGTAG, "Successfully Got Poeple");
+            return phoneNumbers;
+        } catch (Exception e) {
+            Log.i(LOGTAG, "Failed to get Poeple " + e.toString());
             return null;
         }
     }
@@ -224,6 +252,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             while (cursor.moveToNext()) {
                 byte[] imgByte = cursor.getBlob(0);
+                Log.i("test",imgByte + "");
                 bl.add(BitmapFactory.decodeByteArray(imgByte, 0, imgByte.length));
             }
             cursor.close();
@@ -273,14 +302,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     //used in ViewTask.java to display list of all groups
-    public String[] getTaskList(String phnNumber) {
+    public List<String[]> getTaskList(String phnNumber) {
         try {
             SQLiteDatabase db = this.getWritableDatabase();
 
             //get the cursor
             //SQL Statement to get GroupNames Details.
             String SQLCALL =
-                    "SELECT eventTitle from EventTable where eventID IN " +
+                    "SELECT eventTitle,eventID from EventTable where eventID IN " +
                             "(SELECT eventID FROM EventUserTable NATURAL JOIN EventTable " +
                             "WHERE phoneNumber=";
             Cursor cursor = db.rawQuery(SQLCALL + String.valueOf(phnNumber) + " and completedDate IS NULL)", null);
@@ -288,18 +317,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             //count the number of rows
             int rowNum = cursor.getCount();
 
+            List<String[]> eventDetails = new ArrayList<>();
+
             String[] eventNames = new String[rowNum];
+
+            String[] eventIds = new String[rowNum];
 
             int i = 0;
             while (cursor.moveToNext()) {  // get the data into array, or class variable
                 eventNames[i] = cursor.getString(0);
+                eventIds[i] = cursor.getString(1);
+                eventDetails.add(new String[]{eventIds[i], eventNames[i]});
                 i++;
             }
 
             cursor.close();
             db.close();
             Log.i(LOGTAG, "Successfully Fetched EventNames");
-            return eventNames;
+            return eventDetails;
         } catch (Exception e) {
             Log.i(LOGTAG, "Failed to Fetch EventNames " + e.toString());
             return null;
@@ -417,7 +452,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Cursor cursor2 = db.rawQuery(SQLCALL_FOR_NUM + eventId, null);
 
 
-
             String SQLCALL_FOR_NAME =
                     "SELECT firstName, lastName FROM UserTable " +
                             "WHERE phoneNumber=";
@@ -429,17 +463,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             int temp = 0;
 
 
-
             Cursor cursor_Names = null;
-            while (cursor2.moveToNext()){
+            while (cursor2.moveToNext()) {
                 Log.i("Phone #", cursor2.getString(0));
                 cursor_Names = db.rawQuery(SQLCALL_FOR_NAME + cursor2.getString(0), null);
                 cursor_Names.moveToNext();
-                personsInvolved = personsInvolved + cursor_Names.getString(0) + " " +cursor_Names.getString(1) +", " ;
+                personsInvolved = personsInvolved + cursor_Names.getString(0) + " " + cursor_Names.getString(1) + ", ";
                 Log.i("Phone #", personsInvolved);
             }
 
-            personsInvolved = personsInvolved.substring(0,personsInvolved.length()-2);
+            personsInvolved = personsInvolved.substring(0, personsInvolved.length() - 2);
 
             if (i == position) {
                 taskTitle = cursor.getString(1);

@@ -18,7 +18,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ViewSingleTask extends AppCompatActivity {
+public class ViewSingleTaskCompleted extends AppCompatActivity {
 
     TextView tvDueDate;
     TextView tvStartDate;
@@ -69,9 +69,6 @@ public class ViewSingleTask extends AppCompatActivity {
             }
         }
     }
-
-    //Fetching all the layout items
-    int eventID;
 
     private void findViewsById() {
         tvDueDate = (TextView) findViewById(R.id.tvDueDate);

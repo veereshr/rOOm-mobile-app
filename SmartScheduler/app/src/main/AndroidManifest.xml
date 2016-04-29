@@ -13,6 +13,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
+    <uses-permission android:name="android.permission.SEND_SMS" />
 
     <application
         android:allowBackup="true"
@@ -20,17 +21,13 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
-
         <service
             android:name=".AlertReceiver"
             android:exported="false" />
 
-
         <activity
             android:name=".CreateTask"
-            android:label="Create Task"></activity>
-
+            android:label="Create Task" />
         <activity android:name=".LogIn">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -41,7 +38,6 @@
         <activity
             android:name=".CreateAccount"
             android:label="Create Account" />
-
         <activity
             android:name=".InviteToGroup"
             android:label="Create Account" />
@@ -58,7 +54,7 @@
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar" />
-
+        <activity android:name=".ViewSingleTaskCompleted"></activity>
     </application>
 
 </manifest>

@@ -1,8 +1,6 @@
 package com.example.dips.smartscheduler;
 
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -15,11 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,12 +36,12 @@ public class ViewTask extends Fragment{
         //create DatabaseHelper
         DatabaseHelper dbHelper=new DatabaseHelper(this.getContext());
 
-        String[] eventNames=dbHelper.getTaskList(phoneNumber);
+        final List<String[]> eventDetails = dbHelper.getTaskList(phoneNumber);
 
         //set NOTASKDATA text view visibilty property
         TextView txtNoGroup= (TextView) TaskTabRelLayout.findViewById(R.id.txtViewTaskData);
-        if(eventNames.length==0){
-            Log.d("Event Size:", String.valueOf(eventNames.length));
+        if(eventDetails.size()==0){
+            Log.d("Event Size:", String.valueOf(eventDetails.size()));
             txtNoGroup.setVisibility(View.VISIBLE);
         }
 
@@ -53,10 +49,9 @@ public class ViewTask extends Fragment{
         ListView viewListTask=(ListView)TaskTabRelLayout.findViewById(R.id.viewTaskListView);
         List<String> eventList=new ArrayList<>();
 
-
-        //add eventNames to the list
-        for(int i=0;i<eventNames.length;i++) {
-            eventList.add(eventNames[i]);
+        //add eventDetails to the list
+        for (int i = 0; i < eventDetails.size(); i++) {
+            eventList.add(eventDetails.get(i)[1]);
             Log.d("Event Names:", eventList.get(i));
         }
 
@@ -68,13 +63,14 @@ public class ViewTask extends Fragment{
                 return textView;
             }
         } ;
+
         viewListTask.setAdapter(tasksAdapter);
         viewListTask.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> a, View v, int position, long id) {
 
                 SharedPreferences.Editor editor = TaskFragActivity.getSharedPreferences("Data", 0x0000).edit();
-                editor.putInt("eventID", 1);
+                editor.putInt("eventID", Integer.parseInt(eventDetails.get(position)[0]));
                 editor.putInt("position", position);
                 editor.commit();
                 Intent intent = new Intent(TaskFragActivity.getApplicationContext(), ViewSingleTask.class);

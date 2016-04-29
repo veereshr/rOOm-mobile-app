@@ -20,8 +20,8 @@ public class PagerAdapter1 extends FragmentStatePagerAdapter {
 
         switch (position) {
             //case 0:
-                //GroupList tab1 = new GroupList();
-                //return tab1;
+            //GroupList tab1 = new GroupList();
+            //return tab1;
             case 0:
                 ViewTask tab2 = new ViewTask();
                 return tab2;
