@@ -302,8 +302,8 @@ public class CreateTask extends AppCompatActivity {
         try {
             SmsManager smsManager = SmsManager.getDefault();
             for (int i = 0; i < phoneNumbers.size(); i++) {
-                smsManager.sendTextMessage(String.valueOf(phoneNumbers.get(i)), null, "Hi, " + phoneNumbers.get(i) + ".you are added in the "
-                        + taskName + "task by " + phoneNo, null, null);
+                smsManager.sendTextMessage(String.valueOf(phoneNumbers.get(i)), null, "Hi, " + people.get(i) + ". You were added to a new Task '"
+                        + taskName + "'. Download SmartTask to see more!", null, null);
             }
             Toast.makeText(getApplicationContext(), "SMS sent.", Toast.LENGTH_LONG).show();
         } catch (Exception e) {
