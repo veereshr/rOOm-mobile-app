@@ -46,76 +46,128 @@
 
         <LinearLayout
             android:orientation="vertical"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_weight="2">
-
-            <TextView
-                android:textSize="@dimen/regular_font_size"
-                android:textColor="@color/colorText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Description:"
-                android:id="@+id/tvDescTitle"
-                android:layout_margin="10dp" />
-
-            <TextView
-                android:textSize="@dimen/regular_font_size"
-                android:textColor="@color/colorText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Complete By:"
-                android:id="@+id/tvDateTitle"
-                android:layout_margin="10dp" />
-
-            <TextView
-                android:textSize="@dimen/regular_font_size"
-                android:textColor="@color/colorText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Assigned to:"
-                android:id="@+id/tvUserTitle"
-                android:layout_margin="10dp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:layout_height="match_parent">
 
-            <TextView
-                android:textSize="@dimen/regular_font_size"
-                android:textColor="@color/colorText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="&lt;Description>"
-                android:id="@+id/tvDesc"
-                android:layout_margin="10dp" />
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
 
-            <TextView
-                android:textSize="@dimen/regular_font_size"
-                android:textColor="@color/colorText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="&lt;Date>"
-                android:id="@+id/tvDate"
-                android:layout_margin="10dp" />
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="2">
 
-            <TextView
-                android:textSize="@dimen/regular_font_size"
-                android:textColor="@color/colorText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="&lt;User>"
-                android:id="@+id/tvUser"
-                android:layout_margin="10dp" />
+                    <TextView
+                        android:textSize="@dimen/regular_font_size"
+                        android:textColor="@color/colorText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:text="Description:"
+                        android:id="@+id/tvDescTitle"
+                        android:layout_margin="10dp" />
+
+                    <TextView
+                        android:textSize="@dimen/regular_font_size"
+                        android:textColor="@color/colorText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:text="Due Date:"
+                        android:id="@+id/tvDueDateTitle"
+                        android:layout_margin="10dp" />
+
+                    <TextView
+                        android:textSize="@dimen/regular_font_size"
+                        android:textColor="@color/colorText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:text="Start Date:"
+                        android:id="@+id/tvStartDateTitle"
+                        android:layout_margin="10dp" />
+
+                    <TextView
+                        android:textSize="@dimen/regular_font_size"
+                        android:textColor="@color/colorText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:text="People:"
+                        android:id="@+id/tvUserTitle"
+                        android:layout_margin="10dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:textSize="@dimen/regular_font_size"
+                        android:textColor="@color/colorText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:text="&lt;Description>"
+                        android:id="@+id/tvDesc"
+                        android:layout_margin="10dp" />
+
+                    <TextView
+                        android:textSize="@dimen/regular_font_size"
+                        android:textColor="@color/colorText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:text="&lt;Date>"
+                        android:id="@+id/tvDueDate"
+                        android:layout_margin="10dp" />
+
+                    <TextView
+                        android:textSize="@dimen/regular_font_size"
+                        android:textColor="@color/colorText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:text="&lt;Date>"
+                        android:id="@+id/tvStartDate"
+                        android:layout_margin="10dp" />
+
+                    <TextView
+                        android:textSize="@dimen/regular_font_size"
+                        android:textColor="@color/colorText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:text="&lt;User>"
+                        android:id="@+id/tvUser"
+                        android:layout_margin="10dp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <HorizontalScrollView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/horizontalScrollView" >
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:id="@+id/layoutShowPictures"></LinearLayout>
+                </HorizontalScrollView>
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 

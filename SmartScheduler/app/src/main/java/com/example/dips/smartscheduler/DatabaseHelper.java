@@ -1,6 +1,5 @@
 package com.example.dips.smartscheduler;
 
-import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -9,27 +8,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -78,18 +59,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     //SQL Statement to get GroupNames Details.
-    private static final String GROUPTABLE_DETAILS=
+    private static final String GROUPTABLE_DETAILS =
             "SELECT groupName FROM GroupTable " +
-                    "INNER JOIN UserGroupTable on GroupTable.groupID = UserGroupTable.groupID "+
+                    "INNER JOIN UserGroupTable on GroupTable.groupID = UserGroupTable.groupID " +
                     "WHERE phoneNumber=";
 
     // SQL Statement to get Event Details
-    private static final String EVENTTABLE_DETAILS=
+    private static final String EVENTTABLE_DETAILS =
             "SELECT eventTitle, eventDescription, assignTo, dueDate from EventTable where eventID IN " +
                     "(SELECT eventID FROM GroupEventTable NATURAL JOIN UserGroupTable " +
                     "WHERE phoneNumber=";
 
     private Context context;
+
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context = context;
@@ -261,24 +243,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-
-
     //used in GroupList.java to display list of all groups
-    public String[] getGroupList(int phnNumber){
-        try
-        {
+    public String[] getGroupList(int phnNumber) {
+        try {
             SQLiteDatabase db = this.getWritableDatabase();
 
             //get the cursor to the GroupTable
-            Cursor cursor = db.rawQuery(GROUPTABLE_DETAILS+String.valueOf(phnNumber), null);
+            Cursor cursor = db.rawQuery(GROUPTABLE_DETAILS + String.valueOf(phnNumber), null);
             //count the number of rows
-            int rowNum=cursor.getCount();
+            int rowNum = cursor.getCount();
 
             String[] groupNames = new String[rowNum];
 
-            int i=0;
-            while (cursor.moveToNext()){  // get the data into array, or class variable
-                groupNames[i]=cursor.getString(0);
+            int i = 0;
+            while (cursor.moveToNext()) {  // get the data into array, or class variable
+                groupNames[i] = cursor.getString(0);
                 i++;
             }
 
@@ -286,7 +265,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
             Log.i(LOGTAG, "Successfully Fetched GroupNames");
             return groupNames;
-        }catch(Exception e){
+        } catch (Exception e) {
             Log.i(LOGTAG, "Failed to Fetch GroupNames " + e.toString());
             return null;
         }
@@ -294,27 +273,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     //used in ViewTask.java to display list of all groups
-    public String[] getTaskList(String phnNumber){
-        try
-        {
+    public String[] getTaskList(String phnNumber) {
+        try {
             SQLiteDatabase db = this.getWritableDatabase();
 
             //get the cursor
             //SQL Statement to get GroupNames Details.
-            String SQLCALL=
+            String SQLCALL =
                     "SELECT eventTitle from EventTable where eventID IN " +
                             "(SELECT eventID FROM EventUserTable NATURAL JOIN EventTable " +
                             "WHERE phoneNumber=";
-            Cursor cursor = db.rawQuery(SQLCALL+String.valueOf(phnNumber)+" and completedDate IS NULL)", null);
+            Cursor cursor = db.rawQuery(SQLCALL + String.valueOf(phnNumber) + " and completedDate IS NULL)", null);
 
             //count the number of rows
-            int rowNum=cursor.getCount();
+            int rowNum = cursor.getCount();
 
             String[] eventNames = new String[rowNum];
 
-            int i=0;
-            while (cursor.moveToNext()){  // get the data into array, or class variable
-                eventNames[i]=cursor.getString(0);
+            int i = 0;
+            while (cursor.moveToNext()) {  // get the data into array, or class variable
+                eventNames[i] = cursor.getString(0);
                 i++;
             }
 
@@ -322,39 +300,38 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
             Log.i(LOGTAG, "Successfully Fetched EventNames");
             return eventNames;
-        }catch(Exception e){
+        } catch (Exception e) {
             Log.i(LOGTAG, "Failed to Fetch EventNames " + e.toString());
             return null;
         }
     }
 
     //used in CompleteTaskList.java to display list of all Completed tasks
-    public List<String[]> getCmpltTaskList(String phnNumber){
-        try
-        {
+    public List<String[]> getCmpltTaskList(String phnNumber) {
+        try {
             SQLiteDatabase db = this.getWritableDatabase();
 
             //get the cursor
             //SQL Statement to get GroupNames Details.
-            String SQLQuery=
+            String SQLQuery =
                     "SELECT eventTitle,eventID from EventTable where eventID IN " +
                             "(SELECT eventID FROM EventUserTable NATURAL JOIN EventTable " +
-                            "WHERE phoneNumber=" ;
+                            "WHERE phoneNumber=";
             Cursor cursor = db.rawQuery(SQLQuery + String.valueOf(phnNumber) + " and completedDate IS NOT NULL)", null);
 
             //count the number of rows
-            int rowNum=cursor.getCount();
+            int rowNum = cursor.getCount();
 
-            List<String[]> eventDetails=new ArrayList<>();
+            List<String[]> eventDetails = new ArrayList<>();
 
             String[] eventNames = new String[rowNum];
 
             String[] eventIds = new String[rowNum];
 
-            int i=0;
-            while (cursor.moveToNext()){  // get the data into array, or class variable
-                eventNames[i]=cursor.getString(0);
-                eventIds[i]=cursor.getString(1);
+            int i = 0;
+            while (cursor.moveToNext()) {  // get the data into array, or class variable
+                eventNames[i] = cursor.getString(0);
+                eventIds[i] = cursor.getString(1);
                 eventDetails.add(new String[]{eventIds[i], eventNames[i]});
                 i++;
             }
@@ -363,16 +340,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
             Log.i(LOGTAG, "Successfully Fetched CompletedEventNames");
             return eventDetails;
-        }catch(Exception e){
+        } catch (Exception e) {
             Log.i(LOGTAG, "Failed to Fetch CompletedEventNames " + e.toString());
             return null;
         }
     }
 
 
-
-    public int CreateGroup(String name, String desc, String phoneNumber){
-        try{
+    public int CreateGroup(String name, String desc, String phoneNumber) {
+        try {
             SQLiteDatabase db = this.getWritableDatabase();
 
             ContentValues values = new ContentValues();
@@ -392,28 +368,34 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             Log.i(LOGTAG, "Successfully created group ");
             return 1;
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.i(LOGTAG, "Failed to create group " + e.toString());
         }
         return -1;
     }
 
     //used in ViewSingleTask.java to display the details of single task
-    public String[] getTaskDetails(int phnNumber, int position) {
+    public String[] getTaskDetails(String phnNumber, int position) {
         try {
+            Log.i("IN DBHelper", "Fetching data for viewSingleTask");
+
             SQLiteDatabase db = this.getReadableDatabase();
 
             //get the cursor
-            Cursor cursor = db.rawQuery(EVENTTABLE_DETAILS + String.valueOf(phnNumber) + ")", null);
+            //SQL Statement to get GroupNames Details.
+            String SQLCALL =
+                    "SELECT eventID, eventTitle, eventDescription, DueDate, startDate from EventTable where eventID IN " +
+                            "(SELECT eventID FROM EventUserTable NATURAL JOIN EventTable " +
+                            "WHERE phoneNumber=";
+            Cursor cursor = db.rawQuery(SQLCALL + String.valueOf(phnNumber) + " and completedDate IS NULL)", null);
 
-            //count the number of rows
-            int rowNum = cursor.getCount();
 
             String taskTitle;
             String taskDescription;
-            String user;
-            String date;
+            String dueDate;
+            String startDate;
             String[] taskDetails;
+
 
             int i = 0;
             if (position != 0) {
@@ -426,13 +408,46 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
             cursor.moveToNext();
 
-            if (i == position) {
-                taskTitle = cursor.getString(0);
-                taskDescription = cursor.getString(1);
-                user = cursor.getString(2);
-                date = cursor.getString(3);
 
-                taskDetails = new String[]{taskTitle, taskDescription, user, date};
+            String eventId = cursor.getString(0);
+
+            String SQLCALL_FOR_NUM =
+                    "SELECT phoneNumber FROM EventUserTable " +
+                            "WHERE eventID=";
+            Cursor cursor2 = db.rawQuery(SQLCALL_FOR_NUM + eventId, null);
+
+
+
+            String SQLCALL_FOR_NAME =
+                    "SELECT firstName, lastName FROM UserTable " +
+                            "WHERE phoneNumber=";
+
+            String personsInvolved = "";
+            int count = cursor2.getCount();
+            String[] numbersInvolved = new String[cursor2.getCount()];
+            //cursor2.moveToFirst();
+            int temp = 0;
+
+
+
+            Cursor cursor_Names = null;
+            while (cursor2.moveToNext()){
+                Log.i("Phone #", cursor2.getString(0));
+                cursor_Names = db.rawQuery(SQLCALL_FOR_NAME + cursor2.getString(0), null);
+                cursor_Names.moveToNext();
+                personsInvolved = personsInvolved + cursor_Names.getString(0) + " " +cursor_Names.getString(1) +", " ;
+                Log.i("Phone #", personsInvolved);
+            }
+
+            personsInvolved = personsInvolved.substring(0,personsInvolved.length()-2);
+
+            if (i == position) {
+                taskTitle = cursor.getString(1);
+                taskDescription = cursor.getString(2);
+                dueDate = cursor.getString(3);
+                startDate = cursor.getString(4);
+
+                taskDetails = new String[]{taskTitle, taskDescription, dueDate, startDate, personsInvolved, eventId};
                 cursor.close();
                 db.close();
                 Log.i(LOGTAG, "Successfully Fetched Event Details");
@@ -449,17 +464,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public String getPendingJobs(String phoneNumber) {
-        try
-        {
+        try {
             String eventName = null;
             SQLiteDatabase db = this.getWritableDatabase();
 
             //get the cursor
             //SQL Statement to get GroupNames Details.
-            String SQLQuery=
+            String SQLQuery =
                     "SELECT eventTitle,dueDate from EventTable where eventID IN " +
                             "(SELECT eventID FROM EventUserTable NATURAL JOIN EventTable " +
-                            "WHERE phoneNumber=" ;
+                            "WHERE phoneNumber=";
             Cursor cursor = db.rawQuery(SQLQuery + String.valueOf(phoneNumber) + " and completedDate IS NULL)", null);
 
             //count the number of rows
@@ -467,8 +481,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             String today = calendar.get(Calendar.MONTH) + "/" +
                     calendar.get(Calendar.DAY_OF_MONTH) + "/" + calendar.get(Calendar.YEAR);
 
-            while (cursor.moveToNext()){  // get the data into array, or class variable
-                if(cursor.getString(1).equals(today))
+            while (cursor.moveToNext()) {  // get the data into array, or class variable
+                if (cursor.getString(1).equals(today))
                     eventName = cursor.getString(0);
             }
 
@@ -476,7 +490,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
             Log.i(LOGTAG, "Successfully Fetched pending Jobs");
             return eventName;
-        }catch(Exception e){
+        } catch (Exception e) {
             Log.i(LOGTAG, "Failed to Fetch pending Jobs " + e.toString());
             return null;
         }
