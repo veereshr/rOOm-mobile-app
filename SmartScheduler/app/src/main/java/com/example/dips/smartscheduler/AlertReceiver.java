@@ -31,7 +31,6 @@ public class AlertReceiver extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flag, int startId) {
-        //TODO check if you have task today
         DatabaseHelper dbHelper=new DatabaseHelper(this);
 
         SharedPreferences prefs = getSharedPreferences("Data", 0x0000);

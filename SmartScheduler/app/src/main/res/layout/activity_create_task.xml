@@ -50,7 +50,7 @@
                android:layout_height="wrap_content"
                android:id="@+id/createTaskDesc" />
 
-           <LinearLayout
+            <LinearLayout
                android:orientation="horizontal"
                android:layout_width="match_parent"
                android:layout_height="wrap_content">
@@ -69,7 +69,15 @@
                    android:layout_height="match_parent"
                    android:id="@+id/spinnerCreateTask"
                    android:layout_gravity="center_horizontal" />
-           </LinearLayout>
+
+            </LinearLayout>
+
+            <Switch
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Send Text Message"
+                android:id="@+id/switch1"
+                android:checked="false" />
 
             <ScrollView
                 android:orientation="vertical"

@@ -75,7 +75,7 @@ public class CompleteTaskList extends Fragment {
                 editor.putInt("eventID", Integer.parseInt(eventDetails.get(position)[0]));
                 editor.putInt("position", position);
                 editor.commit();
-                Intent intent = new Intent(CmpltTaskFragActivity.getApplicationContext(), ViewSingleTask.class);
+                Intent intent = new Intent(CmpltTaskFragActivity.getApplicationContext(), ViewSingleTaskCompleted.class);
                 startActivity(intent);
             }
         });

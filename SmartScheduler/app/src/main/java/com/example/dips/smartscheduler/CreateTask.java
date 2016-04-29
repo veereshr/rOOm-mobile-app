@@ -28,7 +28,9 @@ import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -272,7 +274,8 @@ public class CreateTask extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("Data", MODE_PRIVATE);
         phoneNumbers.add(prefs.getString("phoneNumber", "0"));
 
-        sendSMS(title, prefs.getString("phoneNumber", "0"));
+        if(((Switch) findViewById(R.id.switch1)).isChecked())
+            sendSMS(title, prefs.getString("phoneNumber", "0"));
 
         //CREATE EVENT IN DB
         new CreateTaskDB(this, phoneNumbers, imageList).execute(new String[]{title, desc, date, startdate}, null, null);
