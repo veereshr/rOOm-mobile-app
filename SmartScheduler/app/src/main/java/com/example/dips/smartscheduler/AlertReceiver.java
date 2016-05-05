@@ -51,7 +51,7 @@ public class AlertReceiver extends Service {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getBaseContext());
 
         builder.setSmallIcon(R.drawable.iconnotification);
-        builder.setContentTitle("You have a new Task!");
+        builder.setContentTitle("You have a Task due today!");
         builder.setContentText(taskName);
         builder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
         builder.setVibrate(new long[]{0, 100, 0, 0});

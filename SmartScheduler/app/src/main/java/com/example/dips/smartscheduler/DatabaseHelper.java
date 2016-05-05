@@ -511,7 +511,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             //count the number of rows
             Calendar calendar = Calendar.getInstance();
-            String today = calendar.get(Calendar.MONTH) + "/" +
+            String today = (calendar.get(Calendar.MONTH) + 1) + "/" +
                     calendar.get(Calendar.DAY_OF_MONTH) + "/" + calendar.get(Calendar.YEAR);
 
             while (cursor.moveToNext()) {  // get the data into array, or class variable

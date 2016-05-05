@@ -29,7 +29,7 @@ public class ViewSingleTaskCompleted extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view_single_task);
+        setContentView(R.layout.activity_view_single_task_completed);
         findViewsById();
         fetchDetails();
     }
