@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
@@ -55,7 +56,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String EVENTPICTURETABLE_CREATE =
             "CREATE TABLE EventPictureTable( " +
                     "eventID INTEGER," +
-                    "picture BLOB);";
+                    "picture TEXT);";
 
 
     //SQL Statement to get GroupNames Details.
@@ -251,8 +252,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Cursor cursor = db.rawQuery("SELECT picture FROM EventPictureTable where eventID = " + taskID, null);
 
             while (cursor.moveToNext()) {
-                byte[] imgByte = cursor.getBlob(0);
-                Log.i("test",imgByte + "");
+                String pictureAsString = cursor.getString(0);
+                Log.i("test",pictureAsString);
+                byte[] imgByte =  Base64.decode(pictureAsString, Base64.DEFAULT);
                 bl.add(BitmapFactory.decodeByteArray(imgByte, 0, imgByte.length));
             }
             cursor.close();

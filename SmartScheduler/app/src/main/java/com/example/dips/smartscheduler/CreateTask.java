@@ -22,6 +22,7 @@ import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.SmsManager;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -92,7 +93,7 @@ public class CreateTask extends AppCompatActivity {
     @SuppressWarnings("deprecation")
     protected Dialog onCreateDialog(int id) {
         if (id == 999) {
-            return new DatePickerDialog(this, myDateListener, year, month, day);
+            return new DatePickerDialog(this, myDateListener, year, month - 1, day);
         }
         return null;
     }
@@ -305,9 +306,7 @@ public class CreateTask extends AppCompatActivity {
                 smsManager.sendTextMessage(String.valueOf(phoneNumbers.get(i)), null, "Hi, " + people.get(i) + ". You were added to a new Task '"
                         + taskName + "'. Download SmartTask to see more!", null, null);
             }
-            Toast.makeText(getApplicationContext(), "SMS sent.", Toast.LENGTH_LONG).show();
         } catch (Exception e) {
-            Toast.makeText(getApplicationContext(), "SMS faild, please try again.", Toast.LENGTH_LONG).show();
             e.printStackTrace();
         }
     }
@@ -462,11 +461,13 @@ class CreateTaskDB extends AsyncTask<String[], String, Integer> {
 
         //EVENT PICTURES
         for (int i = 0; i < imageList.size(); i++) {
-            byte[] data = getBitmapAsByteArray((Bitmap) imageList.get(i));
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            ((Bitmap)imageList.get(i)).compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
+            String pictureAsString = Base64.encodeToString(outputStream.toByteArray(), Base64.DEFAULT);
 
             sqlCall = "INSERT INTO `EventPictureTable`(`eventID`, `picture`) VALUES ('" +
                     eventID + "','" +
-                    data +
+                    pictureAsString +
                     "')";
             try {
                 //POST the sql command you want
@@ -529,12 +530,5 @@ class CreateTaskDB extends AsyncTask<String[], String, Integer> {
         } catch (Exception e) {
 
         }
-    }
-
-    //used to convert bitmaps to byteArray for storage
-    public static byte[] getBitmapAsByteArray(Bitmap bitmap) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
-        return outputStream.toByteArray();
     }
 }

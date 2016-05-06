@@ -2,6 +2,7 @@ package com.example.dips.smartscheduler;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,6 +14,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -43,6 +45,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -261,15 +264,15 @@ class CompleteTaskDB extends AsyncTask<String[], String, Integer> {
 
         //EVENT PICTURES
         for (int i = 0; i < imageList.size(); i++) {
-            byte[] data = getBitmapAsByteArray((Bitmap) imageList.get(i));
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            ((Bitmap)imageList.get(i)).compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
+            String pictureAsString = Base64.encodeToString(outputStream.toByteArray(), Base64.DEFAULT);
 
             sqlCall = "INSERT INTO `EventPictureTable`(`eventID`, `picture`) VALUES ('" +
                     strings[0][3] + "','" +
-                    data +
+                    pictureAsString +
                     "')";
 
-            //TODO REMOVE
-            Log.i("test" , sqlCall);
             try {
                 //POST the sql command you want
                 ArrayList<NameValuePair> nameValuePairs = new ArrayList<>();
@@ -331,12 +334,5 @@ class CompleteTaskDB extends AsyncTask<String[], String, Integer> {
         } catch (Exception e) {
 
         }
-    }
-
-    //used to convert bitmaps to byteArray for storage
-    public static byte[] getBitmapAsByteArray(Bitmap bitmap) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
-        return outputStream.toByteArray();
     }
 }
