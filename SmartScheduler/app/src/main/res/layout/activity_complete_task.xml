@@ -27,7 +27,8 @@
                 android:textColor="@color/colorText"
                 android:text="Title"
                 android:id="@+id/completeTaskTitle"
-                android:gravity="center" />
+                android:gravity="center"
+                android:textStyle="bold" />
 
             <TextView
                 android:layout_width="fill_parent"
@@ -133,7 +134,7 @@
                 android:textSize="@dimen/regular_font_size"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Task Completed!"
+                android:text="Finish Task"
                 android:textColor="@color/colorText"
                 android:onClick="CompleteTest" />
 

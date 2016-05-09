@@ -53,7 +53,7 @@ public class CompleteTaskList extends Fragment {
 
         //add eventDetails to the list
         for (int i = 0; i < eventDetails.size(); i++) {
-            eventList.add(eventDetails.get(i)[1]);
+            eventList.add((i+1)+". "+eventDetails.get(i)[1]);
             Log.d("Event Names:", eventList.get(i));
         }
 

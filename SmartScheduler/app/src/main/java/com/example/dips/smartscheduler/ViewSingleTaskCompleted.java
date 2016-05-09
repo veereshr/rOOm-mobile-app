@@ -3,14 +3,17 @@ package com.example.dips.smartscheduler;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,7 +27,8 @@ public class ViewSingleTaskCompleted extends AppCompatActivity {
     TextView tvStartDate;
     TextView tvDesc;
     TextView txtViewTask;
-    Spinner spinner;
+    Button btnClose;
+    ListView listViewAddPeople;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +36,13 @@ public class ViewSingleTaskCompleted extends AppCompatActivity {
         setContentView(R.layout.activity_view_single_task_completed);
         findViewsById();
         fetchDetails();
+        btnClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void fetchDetails() {
@@ -53,11 +64,22 @@ public class ViewSingleTaskCompleted extends AppCompatActivity {
                 tvStartDate.setText(eventDetails[3]);
 
                 //get people
-                ArrayList people = dbHelper.GetPeople(eventID);
-                ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                        android.R.layout.simple_spinner_item, people);
-                spinner.setAdapter(adapter);
+                ArrayList peoples = dbHelper.GetPeople(eventID);
+                ArrayList<String> people=new ArrayList();
+                for(int i=0;i<peoples.size();i++) {
+                    people.add(i+1+". "+peoples.get(i));
+                    //    Log.d("people",people.get(i));
+                }
+                ArrayAdapter tasksAdapter= new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_expandable_list_item_1,android.R.id.text1,people){
+                    @Override
+                    public View getView(int position, View convertView, ViewGroup parent) {
+                        TextView textView = (TextView) super.getView(position, convertView, parent);
+                        textView.setTextColor(Color.BLACK);
+                        return textView;
+                    }
+                };
 
+                listViewAddPeople.setAdapter(tasksAdapter);
 
                 List<Bitmap> images = dbHelper.GetImages(eventID);
                 for (Bitmap image : images) {
@@ -75,7 +97,9 @@ public class ViewSingleTaskCompleted extends AppCompatActivity {
         tvStartDate = (TextView) findViewById(R.id.tvStartDate);
         tvDesc = (TextView) findViewById(R.id.tvDesc);
         txtViewTask = (TextView) findViewById(R.id.txtViewTask);
-        spinner = (Spinner) findViewById(R.id.ViewTaskSpinner);
+        listViewAddPeople = (ListView) findViewById(R.id.listViewCmpltTaskAddPeople);
+        btnClose= (Button) findViewById(R.id.btnClose);
+        //spinner = (Spinner) findViewById(R.id.ViewTaskSpinner);
 
     }
 

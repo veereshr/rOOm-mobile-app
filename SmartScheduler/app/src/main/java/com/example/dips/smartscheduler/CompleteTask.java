@@ -1,5 +1,6 @@
 package com.example.dips.smartscheduler;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -14,6 +15,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.util.Base64;
 import android.view.View;
 import android.widget.ImageView;
@@ -56,7 +58,8 @@ public class CompleteTask extends AppCompatActivity {
     private Bitmap curimage;
     private ArrayList imageList = new ArrayList();
     private List<Bitmap> completedImages; // just the ones that were added on this screen
-
+    DatabaseHelper dbhelper;
+    private ArrayList phoneNumbers = new ArrayList(); // people that are added
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,7 +68,7 @@ public class CompleteTask extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("Data", MODE_PRIVATE);
         int taskID = prefs.getInt("eventID", 1);
 
-        DatabaseHelper dbhelper = new DatabaseHelper(this);
+        dbhelper= new DatabaseHelper(this);
         String[] listGroupItems = dbhelper.GetTaskInfo(taskID);
         ((TextView) findViewById(R.id.completeTaskTitle)).setText(listGroupItems[0]);
         ((TextView) findViewById(R.id.completeTaskDesc)).setText(listGroupItems[1]);
@@ -179,7 +182,7 @@ public class CompleteTask extends AppCompatActivity {
         }
     }
 
-    public void CompleteTest(View view) {
+     public void CompleteTest(View view) {
         SharedPreferences prefs = getSharedPreferences("Data", MODE_PRIVATE);
         String comments = ((TextView) findViewById(R.id.completeTaskComments)).getText().toString();
         int taskID = prefs.getInt("eventID", 1);
@@ -189,11 +192,30 @@ public class CompleteTask extends AppCompatActivity {
         String completeDate = (calendar.get(Calendar.MONTH) + 1) + "/" +
                 calendar.get(Calendar.DAY_OF_MONTH) + "/" + calendar.get(Calendar.YEAR);
 
-
-
+        //getphoneNumbers for event
+        phoneNumbers= (ArrayList) dbhelper.getEventPhoneNumbers(taskID);
+        for(int i=0;i<phoneNumbers.size();i++){
+            Log.d("|PhoneNumbers| ", String.valueOf(phoneNumbers.get(i)));
+        }
+        sendSMS();
         new CompleteTaskDB(this, imageList).execute(new String[]{comments, completeDate, phone, taskID + ""}, null, null);
     }
 
+    private void sendSMS() {
+        Log.i("Send SMS", "");
+      //  String phoneNo = phoneNumber;
+   //     String taskName = title;
+
+        try {
+            SmsManager smsManager = SmsManager.getDefault();
+            for (int i = 0; i < phoneNumbers.size(); i++) {
+                smsManager.sendTextMessage(String.valueOf(phoneNumbers.get(i)), null, "Hi, " + phoneNumbers.get(i) + ". The Task that you were added to is finished. '"
+                        , null, null);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     public void Results() {
         Toast.makeText(this, "Task Completed", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);

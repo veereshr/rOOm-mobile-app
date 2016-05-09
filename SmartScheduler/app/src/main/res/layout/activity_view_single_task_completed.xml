@@ -27,7 +27,8 @@
                 android:gravity="center"
                 android:text="Title"
                 android:textColor="@color/colorText"
-                android:textSize="@dimen/title_font_size" />
+                android:textSize="@dimen/title_font_size"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvDesc"
@@ -103,10 +104,21 @@
                 android:textColor="@color/colorText"
                 android:textSize="@dimen/regular_font_size" />
 
-            <Spinner
-                android:id="@+id/ViewTaskSpinner"
+            <ScrollView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/activity_regular_padding"
+                android:paddingRight="@dimen/activity_regular_padding"
+                android:paddingLeft="@dimen/activity_regular_padding">
+
+                <ListView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/listViewCmpltTaskAddPeople"
+                    android:layout_gravity="center_horizontal" />
+
+            </ScrollView>
+
 
             <LinearLayout
                 android:id="@+id/ViewTaskPeople"
@@ -126,12 +138,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="horizontal">
-
-
                 </LinearLayout>
             </HorizontalScrollView>
 
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Close"
+                android:id="@+id/btnClose"
+                android:layout_gravity="center_horizontal" />
+
         </LinearLayout>
     </ScrollView>
-
 </RelativeLayout>

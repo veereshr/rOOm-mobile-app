@@ -344,6 +344,40 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     //used in CompleteTaskList.java to display list of all Completed tasks
+    public List<String> getEventPhoneNumbers(int eventId) {
+        try {
+            SQLiteDatabase db = this.getWritableDatabase();
+
+            //get the cursor
+            //SQL Statement to get PhoneNumber.
+            String SQLQuery ="SELECT phoneNumber FROM EventUserTable " +
+                            "WHERE eventID=";
+
+            Cursor cursor = db.rawQuery(SQLQuery + eventId, null);
+
+            //count the number of rows
+            int rowNum = cursor.getCount();
+
+            List<String> eventPhoneNumbers = new ArrayList<>();
+
+            String[] phoneNumbers=new String[rowNum];
+
+            int i = 0;
+            while (cursor.moveToNext()) {  // get the data into array, or class variable
+                phoneNumbers[i] = cursor.getString(0);
+                Log.d("eventPhoneNumbers",phoneNumbers[i]);
+                eventPhoneNumbers.add(phoneNumbers[i]);
+                i++;
+            }
+
+            return eventPhoneNumbers;
+        } catch (Exception e) {
+        Log.i(LOGTAG, "Failed to Fetch eventPhoneNumbers " + e.toString());
+        return null;
+        }
+    }
+
+            //used in CompleteTaskList.java to display list of all Completed tasks
     public List<String[]> getCmpltTaskList(String phnNumber) {
         try {
             SQLiteDatabase db = this.getWritableDatabase();
